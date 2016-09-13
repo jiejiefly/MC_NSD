@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html ng-app ng-controller="WeeklyRecipesController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>课程表浮动窗口，学生、家长获取课程表</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/ui-box.css">
+    <link rel="stylesheet" href="../css/ui-base.css">
+    <link rel="stylesheet" href="../css/ui-color.css">
+    <link rel="stylesheet" href="../css/appcan.icon.css">
+    <link rel="stylesheet" href="../css/appcan.control.css">
+    <link rel="stylesheet" href="WeeklyRecipesContent/css/main.css">
+    <link rel="stylesheet" href="../css/ui-common.css">
+    <link rel="stylesheet" href="../css/animate.css">
+</head>
+<body class="um-vp bc-bg">
+    <div id="divLoading" class="ub-f1">
+        <div class="loading">
+            <span class="fa fa-spinner fa-pulse"></span>&nbsp;正在加载中，请稍后...
+        </div>
+    </div>
+    <div id="divContent" class="ub ub-ver ">
+        <div class="ub" ng-if="NoData!=1"  ng-cloak>
+            <div class="ub ub-f1 boxPrt-h " style="max-width: 1.5em">
+                <div class="boxCld-h " ></div>
+            </div>
+            <div class = "ub ub-f3" ng-repeat="Data in WeeklyRecipesData[0].Meal">
+                <div class="ub ub-f3 boxPrt-h ">
+                    <div class="boxCld-h ">{{Data.Name}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="ub WeekColor animated flipInX" ng-repeat="Data in WeeklyRecipesData " ng-if="NoData!=1" ng-cloak>
+            <div class="ub ub-f1 boxPrt "   style="max-width: 1.5em" >
+                <div class="boxCld2" >{{Data.Week}}</div>
+            </div>
+            <div class="ub ub-f3 ub-ver boxPrt2 tx-c " ng-repeat="meal in Data.Meal">
+                <div class=" ut-s ubb bc-border min-h tx-c"   ng-repeat="item in meal.Items"><div class="boxPrt1 diyWidth tx-c">{{item.Dish}}</div></div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/appcan.js"></script>
+    <script src="../js/appcan.control.js"></script>
+    <script src="../js/angular.min.js"></script>
+    <script src="../js/Common.js"></script>
+    <script src="../js/jquery.min.js"></script>
+</body>
+<script>
+
+    appcan.ready(function () {
+        $("#divLoading").hide();
+        $("#divContent").show();
+        $(".jCls").each(function () {
+            var a = myDate.getDay();
+            $(this).find(".boxPrt").eq(a).css({ "border-bottom": "solid 1px red" });
+        });
+
+    });
+    function WeeklyRecipesController($scope, $http) {
+        var isSuccess = 0;
+        var userType = appcan.getLocVal("UserType");
+        var Token = appcan.getLocVal("Token");
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var Type = apiConfig.GetWeeklyRecipes.Type;
+        var Url = apiConfig.GetWeeklyRecipes.Url;
+        var parameters = { "token": Token };
+        var url = GetMappingUrl(Url, parameters);
+        $.ajax({
+            url: url,
+            type: Type,
+            data: parameters,
+            dataType: "json",
+            success: function (data) {
+                isSuccess = 1;
+                $scope.WeeklyRecipesData = data;
+                $scope.$apply();
+                SetTableRowColor();
+                appcan.locStorage.setVal("WeeklyRecipesData", data);
+                if (appcan.locStorage.val("WeeklyRecipesData") == "[]") {
+                    $scope.NoData = 1;
+                    $scope.$apply();
+                }
+            },
+            complete: function () {
+                if (isSuccess == 0) {
+                    var LatestTopOneLessonScheduleData = appcan.locStorage.getVal("WeeklyRecipesData");
+                    var LatestTopOneLessonSchedule = JSON.parse(LatestTopOneLessonScheduleData);
+                    $scope.WeeklyRecipesData = LatestTopOneLessonSchedule;
+                    $scope.$apply();
+                }
+            }
+        });
+    }
+    function SetTableRowColor()
+    {
+        $(".WeekColor:even").css("background-color", "#D9F4FF");
+        $(".WeekColor:odd").css("background-color", "#F3FBFE");
+    }
+</script>
+</html>

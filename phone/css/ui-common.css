@@ -1,0 +1,64 @@
+﻿/*@import url(ui-common.css);*/
+
+.c-wh{background-color: white;}
+.loading{text-align:center;padding-top: 4.75em;}
+.noData {text-align:center;padding-top: 1.5em; font-size:1em; display:none;}
+
+/*���� ui-base .ut-s*/ 
+.ut-v { overflow : hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 3;-webkit-box-orient: vertical;}
+.ut-v1{
+    position:relative;
+    line-height:1.4em;
+    /* 3 times the line-height to show 3 lines */
+    height:4.2em;
+    overflow:hidden;
+}
+.ut-v1::after {
+    content:"...";
+    font-weight:bold;
+    position:absolute;
+    bottom:0;
+    right:0;
+    padding:0 20px 1px 45px;
+    background:url(http://css88.b0.upaiyun.com/css88/2014/09/ellipsis_bg.png) repeat-y;
+}
+
+/*NoData需引用css*/
+.NoDataImg_box {
+    padding-top:3em;
+    width:100%;
+}
+.NoDataImg_bg{
+    background: no-repeat;  
+    background-position:50% 50%;
+    height:10em;
+    background-size:contain;
+    background-image:url("icons/NoData.png");
+}
+.NoData_box{
+    padding:0px 10px;
+    text-align:center;
+    padding-top:1em;
+    line-height:2em;
+    padding:1em 0px 1em;
+    margin:0px 10px;
+    border-top:1px dashed #999999;
+    margin-top:2em;
+}
+.NoData_color {
+    color:#8f8f8f;
+}
+.btn-act2{
+    background-color: #E0E0E0;
+}
+.btn-act3{
+    opacity: 0.3;
+}
+.wordBreak{
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/*ng-cloak 隐藏AngularJS绑定代码的一种方案*/
+@charset "UTF-8";[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide{display:none !important;}ng\:form{display:block;}.ng-animate-start{clip:rect(0,auto,auto,0);-ms-zoom:1.0001;}.ng-animate-active{clip:rect(-1px,auto,auto,0);-ms-zoom:1;}
+

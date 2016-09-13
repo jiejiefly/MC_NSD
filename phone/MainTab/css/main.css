@@ -1,0 +1,60 @@
+﻿.newstianjia{
+	background-image:url('myImg/tianjia.png');
+}
+.t-btn-hf1{
+	background-image:url('myImg/xuanzhong1.png');
+}
+input[type="radio"]:checked + div.fontcolor {
+	color:#218dd5;
+	border-bottom: 1px solid #880000;
+}
+input[type=radio]+div.fontcolor {
+	color:#a1a1a1;
+	border-bottom: 1px solid #f1f1f1;
+}
+.uinn-hnfn2{
+	padding:0.78em 0;
+}
+.uw-hnfn1{
+	width:2.2em;
+}
+.us-hnfn {
+	-webkit-box-shadow:inset 1px 0 20px rgba(0, 0, 0, .3);
+	box-shadow:inset  1px 0 20px rgba(0, 0, 0, .3)
+}
+.uwh-tBtn{
+    width:1.75em;
+    height:1.75em;
+}
+.pdl{padding-left: 0.5em;}
+.icon-add-e {
+    background-image: url('myImg/a9m.png') !important;
+}
+.loading{text-align:center;padding-top: 2em;}
+.index-bc{background-color:white;}
+.bc-border {
+    border-color: #880000;
+}
+
+/*对底部图标重置默认的几个CSS*/
+.tx-c {
+    text-align:center;
+    vertical-align:middle;
+}
+.sc-text-tab {
+    color:#848484;
+}
+/*ulev bc-text-head sc-bg-alert tab_badge  id:badge_0*/
+/*默认tab_badge在appcan.control.css中已经设置宽度，所以这里改为最小宽度是不起作用的，但可以根据ID找到这个对象，把tab_badge移除，然后重新增加一个新CLASS，如tab_badge2*/
+.tab_badge {
+    position: absolute;
+    padding-top:0.1em;
+    min-width: 1.4em;
+    height: 1.3em;
+    right: 0.75em;
+    top: 0.3em;
+    -webkit-border-radius: 1.2em;
+    border-radius: 1.2em;
+    text-align: center;
+    font-size:0.9em;
+}

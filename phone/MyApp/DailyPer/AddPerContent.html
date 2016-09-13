@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html ng-app ng-controller="AddPerController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>添加日常表现选择浮动窗口</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="../../css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../../css/ui-box.css">
+    <link rel="stylesheet" href="../../css/ui-base.css">
+    <link rel="stylesheet" href="../../css/ui-color.css">
+    <link rel="stylesheet" href="../../css/appcan.icon.css">
+    <link rel="stylesheet" href="../../css/appcan.control.css">
+    <link rel="stylesheet" href="AddPerContent/css/main.css">
+</head>
+<body class="um-vp bc-bg">
+    <div class="uba bc-border c-wh  uinn7">
+        <ul>
+            <li class="umar-b umar-t">
+                <div class="uba uinput ub ub-f1 ">
+                    <textarea class="DailyPer" placeholder="请输入学生日常表现" name="txt" clos="10" rows="1" warp="virtual"></textarea>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div id="listview2" class=" ubb bc-border c-wh umar-at1 uinn-a7">
+        <ul>
+            <li class="ubb ub bc-border bc-text ub-ac lis select" id="1" data-index="0">
+                <span class="lv_title ub-f1 marg-l ub ub-ver ut-m line1">
+                    班级
+                </span>
+                <div class="tx-r sc-text   ub umar-r lv_subTitle">
+                    请选择
+                </div>
+                <select selectedindex="0" id="select1">
+                    <option value="-1">请选择</option><!--这里要判断逻辑，如果是-1提示用户必选，另外这里不能删除，因为用户选择第一项的时候，不会回调-->
+                    <option ng-repeat="CD in ClassData" value="{{CD.ClassId}}">{{CD.ClassName}}</option>
+                </select>
+                <div class="fa fa-angle-down ulev2 sc-text"></div>
+            </li>
+            <li class="ubb ub bc-border bc-text ub-ac lis" id="student" data-index="1">
+                <div class="lv_title ub-f1 marg-l ub ub-ver ut-m line1">
+                    学生
+                </div>
+                <div class="tx-r sc-text  umar-rr lv_subTitle" id="divStudent">
+                    请选择
+                </div>
+                <div class="fa fa-angle-right ulev2 sc-text"></div>
+            </li>
+        </ul>
+    </div>
+    <br />
+    <div class="uin uinn">
+        <div class="btn ub ub-ac bc-text-head ub-pc bc-btn uc-a1" id="submit">提 交</div>
+    </div>
+    <script src="../../js/appcan.js"></script>
+    <script src="../../js/appcan.control.js"></script>
+    <script src="../../js/angular.min.js"></script>
+    <script src="../../js/Common.js"></script>
+</body>
+<script>
+    var Name;
+    var ID;
+    var ClassID;
+
+    appcan.ready(function () {
+    });
+
+    function AddPerController($scope, $http) {
+
+        var isSuccess = 0;
+        var Token = appcan.getLocVal("Token");
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var Type = apiConfig.GetClass.Type;
+        var Url = apiConfig.GetClass.Url;
+        var parameters = { "token": Token };
+        var url = GetMappingUrl(Url, parameters);
+        $.ajax({
+            url: url,
+            type: Type,
+            data: parameters,
+            dataType: "json",
+            success: function (data) {
+                isSuccess = 1;
+                $scope.ClassData = data;
+                $scope.$apply();
+                appcan.locStorage.setVal("ClassData",data);
+            },
+            complete: function (xhr, type, error) {
+               if (isSuccess == 0) {
+                    var LatestTopOneClassData = appcan.locStorage.val("ClassData");
+                    var LatestTopOneClass = JSON.parse(LatestTopOneClassData);
+                    $scope.ClassData = LatestTopOneClass;
+                    $scope.$apply();
+               }
+            }
+        });
+
+        $("#student").on("click", function () {
+            if ($("#select1").val() == "-1") {
+                alert("请先选择班级");
+            }
+            else {
+                appcan.window.open("StudentList", "StudentList.html", 5)
+            }
+        })
+        appcan.button("#submit", "ani-act", function () {
+
+            isSuccess = 0 ;
+            var Content = $(".DailyPer").val();
+            var Data = JSON.parse(appcan.locStorage.getVal("ClassData"));
+            for (var i in Data) {
+                if (Data[i].ClassId == ClassID) {
+                    var SendData = { "content": Content, "teacherId": Data[i].TeacherId, "teacherName": Data[i].TeacherName, "studentId": ID, "studentName": Name, "classId": ClassID, "classname": Data[i].ClassName };
+                }
+            }
+            var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+            var Url = apiConfig.PutDailyPer.Url;
+            var Type = apiConfig.PutDailyPer.Type;
+            var parameters = SendData;
+            var url = GetMappingUrl(Url, parameters);
+            if (Content == "") {
+                alert("日常表现内容不能为空,请重新输入！");
+            }
+            else if ($("#select1").val() == "-1") {
+                alert("请选择班级！");
+            }
+            else if (Name == undefined) {
+                alert("请选择学生！");
+            }
+            else {
+                $.ajax({
+                    url: url,
+                    type: Type,
+                    async: false,
+                    data: parameters,
+                    dataType: "json",
+                    success: function (data) {
+                        isSuccess = 1;
+                        appcan.window.alert({
+                            title: '提示',
+                            content: '数据提交成功！',
+                            buttons: '继续'
+                        });
+                        if (isSuccess == 1) {
+                            appcan.window.evaluateScript({
+                                name: "DailyPer",
+                                scriptContent: "Refurbish()"
+                            });
+
+                            appcan.window.evaluateScript({
+                                name: "AddPer",
+                                scriptContent: "Close()"
+                            });
+                        }
+                    },
+                    complete: function (xhr, type, error) {
+                        if (isSuccess == 0) {
+                            appcan.ready(function () {
+                                appcan.window.openToast({
+                                    msg: '加载最新数据失败',
+                                    duration: '2000',
+                                    position: '5',
+                                    type: '0'
+                                });
+                            });
+                        }
+                    }
+                });
+                
+            }
+        })
+    }
+
+    appcan.select(".select", function (ele, value) {
+        ClassID = $("#select1").val();
+        appcan.locStorage.val("ClassID", ClassID);
+    });
+
+    function GetStudent(name, id) {
+        $("#divStudent").html(name);
+        Name = name;
+        ID = id;
+    }
+</script>
+</html>

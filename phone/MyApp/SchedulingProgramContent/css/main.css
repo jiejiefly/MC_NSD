@@ -1,0 +1,105 @@
+﻿.boxPrt-h {
+    position:relative;
+    height:1.75em;
+    line-height:2em;
+    background-color: #fff;
+    border-top:solid 1px #797979;
+    border-bottom:solid 1px #797979;
+    border-right:solid 1px #797979;
+}
+
+.boxCld-h {
+    position:absolute;
+    text-align:center;
+    width:100%;
+    font-size: 1.125em;
+}
+.boxCld1-h {
+    position:absolute;
+    text-align:center;
+    width:100%;
+    color: #009DD9;
+    font-size: 1.125em;
+}
+.boxPrt {
+    position:relative;
+    background-color:#fff;
+    /*border-right:solid 1px #797979;*/
+    /*border-bottom:solid 1px #797979;*/
+    min-height: 3.5em;
+    background-color: white;
+}
+
+.boxCld {
+    position:absolute;
+    text-align:center;
+    width:100%;
+    font-size:0.8125em;
+    color:#000;
+    margin-top:0.35em;
+}
+.boxCld0 {
+    position:absolute;
+    text-align:center;
+    width:100%;
+    height:2.3em;
+    line-height:2.8em;
+    font-size:0.8125em;
+    margin-top:1.25em;
+    color:#000;
+}
+.min-h{
+    min-height: 1.4em;
+}
+.ubb:last-child{
+    border-bottom: none;
+}
+
+.DiyOutline{
+    height:2em;
+    line-height:2em;
+    border-bottom:solid 1px #797979;
+    border-right:solid 1px #797979;
+}
+.tx-c {
+    text-align:center;
+    vertical-align:middle;
+}
+.sc-text-tab {
+    color:#848484;
+}
+.ulev-1 {
+    font-size: 1em !important;
+    border-bottom:solid 1px #009DD9;
+    text-align: center;
+    color: #009DD9;
+}
+.diyFont{
+    font-size: 0.85em;
+}
+.TodayColor{
+    color: #FC7800;
+}
+.CalendarTable {
+    border: 0;
+    cellspacing: 0;
+}
+.txtH-v { 
+    overflow : hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    max-height: 5em;
+    -webkit-box-orient: vertical;
+}
+
+.MaxW{
+    width: 50%;
+    max-height: 1.5em;
+}
+.MinW{
+    min-width: 50%;
+    max-height: 1.5em;
+}
+
+

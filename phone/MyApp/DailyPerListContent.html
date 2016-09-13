@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html ng-app="DailyPerApp" ng-controller="RcbxController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>日常表现教师浮动窗口，获取考勤情况列表</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/ui-box.css">
+    <link rel="stylesheet" href="../css/ui-base.css">
+    <link rel="stylesheet" href="../css/ui-color.css">
+    <link rel="stylesheet" href="../css/appcan.icon.css">
+    <link rel="stylesheet" href="../css/appcan.control.css">
+    <link rel="stylesheet" href="DailyPerContent/css/main.css">
+</head>
+<body class="um-vp bc-bg " ontouchstart>
+    <div id="divLoading" class="ub-f1">
+        <div class="loading">
+            <span class="fa fa-spinner fa-pulse"></span>&nbsp;正在加载中，请稍后...
+        </div>
+    </div>
+    <div style="display:none" id="divContent">
+        <div class="bc-bg" ng-if="NoData==1">
+            <div class="NoDataImg_box ">
+                <div class="NoDataImg_bg"></div>
+            </div>
+            <div class="NoData_box NoData_color">抱歉，暂时没有您要查看的数据！</div>
+        </div>
+        <br />
+        <div class="umar-b" ng-repeat="data in RcbxData" ng-if="NoData!=1">
+            <div class="tx-c sc-text ulev-1">{{data.CreateDate |date : 'yyyy-MM-dd HH:mm'}}</div>
+            <div class="uba bc-border c-wh umar-v uc-a1 uinn7" id="{{data.ID}}">
+                <ul>
+                    <li class="umar-b ub ubb bc-border">
+                        <div class="ulev0 ub-f1 txt-v">{{data.StudentName}}&nbsp;同学的日常表现</div>
+                    </li>
+                    <li class=" bc-border umar-b"></li>
+                    <li class="umar-b umar-t">
+                        <div class="ut-m dataContent" ng-bind-html="data.Content|to_trusted"></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <br />
+    <script src="../js/appcan.js"></script>
+    <script src="../js/appcan.control.js"></script>
+    <script src="../js/angular.min.js"></script>
+    <script src="../js/Common.js"></script>
+</body>
+<script>
+    appcan.ready(function () {
+        $("#divContent").show();
+        $("#divLoading").hide();
+    });
+    var myModule = angular.module("DailyPerApp", []);
+    myModule.controller("RcbxController", ["$scope", function ($scope) {
+        var isSuccess = 0;
+        var Token = appcan.getLocVal("Token");
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var Type = apiConfig.GetDailyPertch.Type;
+        var Url = apiConfig.GetDailyPertch.Url;
+        var parameters = { "token": Token };
+        var url = GetMappingUrl(Url, parameters);
+        $.ajax({
+            url: url,
+            type: Type,
+            data: parameters,
+            dataType: "json",
+            success: function (data) {
+                isSuccess = 1;
+                $scope.RcbxData = data;
+                $scope.$apply();
+                appcan.locStorage.val("RcbxData", data);
+                if (appcan.locStorage.val("RcbxData") == "[]") {
+                    $scope.NoData = 1;
+                    $scope.$apply();
+                }
+            },
+            complete: function () {
+                if (isSuccess == 0) {
+                    var LatestTopOneDailyPerData = appcan.locStorage.val("RcbxData");
+                    var LatestTopOneDailyPer = JSON.parse(LatestTopOneDailyPerData);
+                    $scope.RcbxData = LatestTopOneDailyPer;
+                    $scope.$apply();
+                    appcan.ready(function () {
+                        appcan.window.openToast({
+                            msg: '加载最新数据失败',
+                            duration: '2000',
+                            position: '5',
+                            type: '0'
+                        });
+                    });
+                }
+            }
+        });
+    }])
+    myModule.filter('to_trusted', ['$sce', function ($sce) {
+        return function (text) {
+            var dataContent = text.replace(/\n/g, '<br/>');
+            return $sce.trustAsHtml(dataContent);
+        };
+    }]);
+</script>
+</html>

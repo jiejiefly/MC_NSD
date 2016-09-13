@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+    <head>
+        <title>通知公告详情副页面</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="../../css/fonts/font-awesome.min.css">
+        <link rel="stylesheet" href="../../css/ui-box.css">
+        <link rel="stylesheet" href="../../css/ui-base.css">
+        <link rel="stylesheet" href="../../css/ui-color.css">
+        <link rel="stylesheet" href="../../css/appcan.icon.css">
+        <link rel="stylesheet" href="../../css/appcan.control.css">
+        <link rel="stylesheet" href="DetailContent/css/main.css">
+    </head>
+    <body class="um-vp bc-bg">
+        <div id="divLoading" class="ub-f1">
+            <div class="loading">
+                <span class="fa fa-spinner fa-pulse"></span>&nbsp;正在加载中，请稍后...
+            </div>
+        </div>
+        <div id="divContent" style="display:none;">
+            <div class="ub ub-ver">
+                <div class="ub ub-ver uinn-a1 ub-f1">
+                    <div class=" bc-border c-wh">
+                        <ul class="ubb ub bc-border bc-text ub-ac uinn-a9">
+                            <li class="ub-f1 breakword" id="Title"></li>
+                        </ul>
+                        <ul class="ubb ub bc-border bc-text ub-ac uinn-a9">
+                            <li class="ub-f1 ulev-app1" id="Time"></li>
+                        </ul>
+                        <ul class="ub bc-border bc-text ub-ac uinn-a9">
+                            <li class="ub ub-ver ub-f1 ulev-app1" id="Content"></li>
+                        </ul>
+                        <ul class="ub bc-border bc-text ub-ac uinn-a9 ExtraFile">
+                            <li class="ub ub-ver ub-f1 ulev-app1" id="ExtraFile"></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="../../js/appcan.js"></script>
+        <script src="../../js/appcan.control.js"></script>
+        <!-- <script src="../../JsonData/Note.js"></script> -->
+    </body>
+    <script>
+        appcan.ready(function() {   
+            //appcan.initBounce(); 
+            $("#divLoading").hide();
+            $("#divContent").show();
+
+        });
+        
+        Detail();
+        function Detail () {
+          var NoticeId = appcan.locStorage.val("NoticeId");
+          var NData = JSON.parse(appcan.locStorage.val("NoticeData"));
+            for(var i in NData){
+                if(NData[i].MessageId == NoticeId){
+                var Title = NData[i].Title;
+                var Content = NData[i].Content;
+                var Time = NData[i].MessageTime;
+                var myTime = Time.substring( 0, 16);
+                var ExtraFile = NData[i].FileName;
+                }
+            } 
+            $("#Title").html(Title);  
+            $("#Content").html(Content);
+            $("#Time").html(myTime);
+            if (ExtraFile != "") {
+                $("#ExtraFile").html("附件详情请至PC端查看")
+            } else {
+                $(".ExtraFile").hide();
+            }
+            var imgUrl = "http://221.224.83.111" + $("#Content").find("img").attr("src");
+            $("#Content").find("img").attr("src", imgUrl);
+        }
+    </script>
+</html>

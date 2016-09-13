@@ -1,0 +1,61 @@
+
+.c-wh{
+    background-color: white;
+}
+
+.loading{text-align:center;padding-top: 4.75em;}
+.index-bc{background-color:white;}
+
+.umar-v {margin:0.25em 0.625em 0.75em 0.625em;}
+.txt-v {color:#000;font-weight:bold;}
+.txtH-v { overflow : hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 3;-webkit-box-orient: vertical;}
+
+.txtH-v2{
+    position:relative;
+    line-height:1.4em;
+    /* 3 times the line-height to show 3 lines */
+    height:4.2em;
+    overflow:hidden;
+}
+.txtH-v2::after {
+    content:"...";
+    font-weight:bold;
+    position:absolute;
+    bottom:0;
+    right:0;
+    padding:0 20px 1px 45px;
+    background:url(http://css88.b0.upaiyun.com/css88/2014/09/ellipsis_bg.png) repeat-y;
+}
+.book-pic{
+    background-image:url('myImg/Book-Open.png');
+    background-size:80%;
+    background-repeat:no-repeat;
+}
+.clock-pic{
+    background-image:url('myImg/Clock.png');
+    background-size:60%;
+    background-repeat:no-repeat;
+}
+.cup-pic{
+    background-image:url('myImg/cup.png');
+    background-size:60%;
+    background-repeat:no-repeat;
+}
+.l-margin{
+    margin-left: 1em;
+}
+.score{
+    color:#32CD32;
+    font-size: 1.5em;
+}
+.umw-t{
+    max-width: 12em;
+}
+.btn-act1{
+    opacity: 0.3;//透明度，0.6不是很明显，0.3效果比较好
+}
+
+.btn-act2{
+            background-color: #E0E0E0;
+}
+

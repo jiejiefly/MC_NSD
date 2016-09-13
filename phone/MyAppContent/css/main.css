@@ -1,0 +1,123 @@
+.accban{
+	background-image:url(myImg/accban.png);
+}
+.uh-acc1{
+	height:8em;
+}
+.uwh-acc1{
+	width:3.0625em;
+	height:3.0625em;
+}
+.b-wh-acc1{
+	border-color:rgba(159,159,159,0.56);
+}
+.b-gra-acc2{
+	border-color:rgba(211,207,204,0.5);
+}
+.us-acc1 {
+	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .5);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, .5)
+}
+.us-acc2 {
+	-webkit-box-shadow: 0 1px 0 rgba(110, 98, 91, .5);
+	box-shadow: 0 1px 0 rgba(110, 98, 91, .5);
+}
+.accuser{
+	background-image:url(myImg/accuser.png);
+}
+.c-bla-50{
+	background-color:rgba(0,0,0,0.5);
+}
+.uinn-acc1{
+	padding:0.28125em 0 0.21875em 0;  
+}
+.uinn-acc2{
+	padding:0.375em 0 0.1875em 0;  
+}
+.uwh-acc2{
+	width:2.75em;
+	height:2.75em;
+}
+.accIcon1{
+	background-image:url(myImg/btn010_04.png);
+}
+.accIcon2{
+	background-image:url(myImg/btn010_06.png);
+}
+.accIcon3{
+	background-image:url(myImg/btn010_08.png);
+}
+.accIcon4{
+	background-image:url(myImg/btn010_14.png);
+}
+.accIcon5{
+	background-image:url(myImg/btn010_16.png);
+}
+.accIcon6{
+	background-image:url(myImg/btn010_10.png);
+}
+.accIcon7{
+	background-image:url(myImg/btn010_12.png);
+}
+.accIcon8{
+	background-image:url(myImg/btn010_17.png);
+}
+.accIcon9{
+    background-image:url(myImg/btn010_21.png);
+}
+.accIcon10{
+    background-image:url(myImg/btn010_27.png);
+}
+.accIcon11{
+    background-image:url(myImg/btn010_23.png);
+}
+.accIcon12{
+    background-image:url(myImg/btn010_25.png);
+}
+.accIcon13{
+    background-image:url(myImg/btn010_19.png);
+}
+.accIcon14{
+    background-image:url(myImg/btn010_31.png);
+}
+.accIcon15{
+    background-image:url(myImg/btn010_32.png);
+}
+.accIcon16{
+    background-image:url(myImg/btn010_33.png);
+}
+.umar-t-acc1{
+	margin-top:0.5625em;
+    position:absolute; 
+    text-align:center;
+    width:100%;
+}
+.umar-b {
+    margin-bottom: 1em;
+}
+
+.uinn3
+{
+	padding:0.2em;
+}
+.uinn-a1{
+    padding:0.625em;
+}
+.mar-ar1{
+    margin-right:0.625em;
+}
+.ulev-app1{
+    font-size:0.875em;
+}
+.umar-ar3{
+    margin-right:0.5em;
+}
+.umar-at1{
+    margin-top:1em;
+}
+.c-wh{
+    background-color: white;
+}
+.h100 {
+    height:100%;
+}

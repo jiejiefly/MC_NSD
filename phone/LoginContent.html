@@ -1,0 +1,169 @@
+﻿<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>登录浮动页面</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="css/ui-box.css">
+    <link rel="stylesheet" href="css/ui-base.css">
+    <link rel="stylesheet" href="css/ui-color.css">
+    <link rel="stylesheet" href="css/appcan.icon.css">
+    <link rel="stylesheet" href="css/appcan.control.css">
+    <link rel="stylesheet" href="LoginContent/css/main.css">
+</head>
+<body class="um-vp bc-bg">
+    <div id="page_0" class="up ub ub-ver ub-img1" tabindex="0">
+        <div id="content" class="ub-f1 tx-l ub ub-ver c-wh1">
+            <div class="uinn ub ub-ac ub-pc">
+                <div class="logo ub-img umhw1"></div>
+            </div>
+            <div class="uinn ub ub-ac ub-pc ub-ver">
+                <div class="ulev0 t-blu addfont umar-t umar-b">无论您在哪里，校园都在您手里</div>
+                <!--<div class="ulev1 t-blu addfont uinn">过去教育在纸上，如今教育在手中</div>-->
+            </div>
+            <div class="ub ub-ver">
+                <div class="uba b-gra umar-a uc-a1 c-wh">
+                    <div class="ub ub-ac">
+                        <div class="umhw resuser ub-img umar-l"></div>
+                        <div class="ub-f1 uinput uinn">
+                            <input placeholder="手机/邮箱/用户名" id="uid" value="" type="text" class="uc-a1">
+                        </div>
+                    </div>
+                </div>
+                <div class="uba b-gra umar-a uc-a1 c-wh">
+                    <div class="ub ub-ac">
+                        <div class="umhw respwd ub-img umar-l"></div>
+                        <div class="ub-f1 uinput uinn">
+                            <input placeholder="密码" id="upwd" value="" type="password" class="uc-a1">
+                        </div>
+                    </div>
+                </div>
+                <div class="uin uinn">
+                    <div class="btn ub ub-ac bc-text-head ub-pc bc-btn uc-a1" id="submit">登　录</div>
+                </div>
+
+                <!-- <div class="umar-a ub ub-pc t-blu">
+                    <div class="ulev0 uinn3">忘记密码？</div>
+                    |&nbsp;&nbsp;
+                    <div class="ulev0 uinn3">没有帐号？</div>
+                </div> -->
+
+                <div class="uinn ub ub-ac ub-pc ub-ver">
+                    <div class="ulev0 t-blu addfont umar-t" id="footName"></div>
+                </div>
+            </div>
+            <div class="uinn ub ub-ac ub-pc">
+                <div class="ub-f1 ub ub-ver ub-ac ub-pc" id="divStudent">
+                    <div class="student ub-img umhw2 umar-a uc-a"></div>
+                    <div class="umhw3 tx-c">学生体验</div>
+                </div>
+                <div class="ub-f1 ub ub-ver ub-ac ub-pc" id="divTeacher">
+                    <div class="teacher ub-img umhw2 umar-a uc-a"></div>
+                    <div class="umhw3 tx-c">老师体验</div>
+                </div>
+                <div class="ub-f1 ub ub-ver ub-ac ub-pc" id="divParents">
+                    <div class="parents ub-img umhw2 umar-a uc-a"></div>
+                    <div class="umhw3 tx-c">家长体验</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/appcan.js"></script>
+    <script src="js/appcan.control.js"></script>
+</body>
+<script>
+    appcan.ready( function () {
+
+        var appConfig = JSON.parse( appcan.getLocVal( "AppConfig" ) );
+        $( "#footName" ).html( appConfig.Name );
+
+    } );
+
+    function login() {
+        var name = $( "#uid" ).val().trim();
+        var pwd = $( "#upwd" ).val().trim();
+        if ( name == "" || name == "手机/邮箱/用户名" ) {
+            appcan.window.openToast( ' 账号不能为空', '2000' );
+            return;
+        }
+        else if ( pwd == "" || pwd == '密码' ) {
+            appcan.window.openToast( ' 密码不能为空', '2000' );
+            return;
+        }
+        else {
+            //向服务器发送Ajax请求
+            var token;
+            var apiConfig = JSON.parse( appcan.getLocVal( "ApiConfig" ) );
+            var Type = apiConfig.GetToken.Type;
+            var url = apiConfig.GetToken.Url;
+            $.ajax( {
+                url: url,
+                type: Type,
+                dataType: "json",
+                success: function ( data ) {
+                    //根据用户名称读取Token
+                    $.each( data, function ( index, item ) {
+
+                        if ( item.UserName.toUpperCase() == name.toUpperCase() ) {
+                            token = item.Token;
+                        }
+
+                    } );
+
+                    //先把Token Remove掉，因为evaluateScript Login和evaluateScript root，都是异步执行，他们两个的执行顺序不能保证是前面的先执行。
+                    //当前面的后执行时候，ExecuteMoreTimes里面就有可能调用历史Token数据了，这种情况概率很低，为了防止此情况，就先清除下Token。
+                    appcan.locStorage.remove( "Token" );
+
+                    appcan.window.evaluateScript( {
+                        name: "Login",
+                        scriptContent: "SetLocToken('" + token + "')"
+                    } );
+
+                    appcan.window.evaluateScript( {
+                        name: "root",
+                        scriptContent: "ExecuteMoreTimes();"
+                    } );
+
+                },
+                error: function () { alert( '读取OnlineSampleApi配置文件错误(007)！' ); }
+            } );
+
+            //appcan.window.open({ name: 'MainTab', data: 'MainTab.html', aniId: 5 });
+            //在线使用此代码,青岛对应的在线位置:63/MIFVS/SEP.Auth/View/OAuth and Account
+            //appcan.window.open({ name: 'MainTab', data: 'wgtroot://MainTab.html', aniId: 5 });
+        }
+    }
+
+    appcan.button( "#submit", "ani-act", function () {
+        login();
+    } );
+
+    $( "#divStudent" ).on( "touchend", function () {
+        $( '#uid' ).val( "student1" );
+        $( '#upwd' ).val( "111111" );
+    } );
+    $( "#divTeacher" ).on( "touchend", function () {
+        $( '#uid' ).val( "teacher1" );
+        $( '#upwd' ).val( "111111" );
+    } );
+    $( "#divParents" ).on( "touchend", function () {
+        $( '#uid' ).val( "parents1" );
+        $( '#upwd' ).val( "111111" );
+    } );
+
+    //$("#divStudent").on("touchend", function () {
+    //    $('#uid').val("58changy");
+    //    $('#upwd').val("111111");
+    //});
+    //$("#divTeacher").on("touchend", function () {
+    //    $('#uid').val("58_lwq");
+    //    $('#upwd').val("111111");
+    //});
+    //$("#divParents").on("touchend", function () {
+    //    $('#uid').val("370202196202034896");
+    //    $('#upwd').val("034896");
+    //});
+
+</script>
+</html>

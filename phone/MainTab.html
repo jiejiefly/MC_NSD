@@ -1,0 +1,264 @@
+﻿<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="css/ui-box.css">
+    <link rel="stylesheet" href="css/ui-base.css">
+    <link rel="stylesheet" href="css/ui-color.css">
+    <link rel="stylesheet" href="css/appcan.icon.css">
+    <link rel="stylesheet" href="css/appcan.control.css">
+    <link rel="stylesheet" href="MainTab/css/main.css">
+    <script></script>
+</head>
+<body class="um-vp bc-bg">
+    <div id="page_0" class="up ub ub-ver" tabindex="0">
+
+        <!--header开始-->
+        <div id="header" class="uh bc-text-head ub bc-head">
+            <div class="nav-btn pdl" id="nav-left">消息</div>
+            <h1 id="headName" class="ut ub-f1 ulev-3 ut-s tx-c" tabindex="0"></h1>
+            <div class="nav-btn" id="nav-right">
+                <div class="ub-img icon-add-e umw2 umh4" style="display:none"></div>
+            </div>
+        </div>
+        <!--header结束-->
+        <!--content开始-->
+        <div id="content" class="ub-f1">
+            <!--<div class="loading">
+                <span class="fa fa-spinner fa-pulse"></span>&nbsp;正在加载中，请稍后...
+            </div>-->
+        </div>
+        <!--content结束-->
+        <!--footer开始-->
+        <div id="footer" class="uf t-bla ub tab bc-text-head ubt bc-border index-bc"></div>
+        <!--footer结束-->
+
+    </div>
+    <script src="js/appcan.js"></script>
+    <script src="js/appcan.control.js"></script>
+    <script src="js/appcan.tab.js"></script>
+    <script src="js/Common.js"></script>
+</body>
+<script>
+    
+    var titHeight;
+    window.uexOnload = function (type) {
+
+        var appConfig = JSON.parse( appcan.getLocVal( "AppConfig" ) );
+        $( "#headName" ).html( appConfig.Name );
+        
+        if (!type) { ExitForAndroid(); }
+
+        appcan.ready(function () {
+            GetContactsInfo();
+            titHeight = $('#header').offset().height;
+
+            var index = 2;
+            IndexInit(index);//初始化Index页面
+
+            //appcan.frame.open("content", "IndexContent.html", 0, 0);
+            window.onorientationchange = window.onresize = function () {
+                appcan.frame.resize("content", 0, titHeight);
+            }
+
+            $("#badge_0").hide();
+
+            var contentHeight = $('#content').offset().height;
+            appcan.setLocVal('uexIndexBar_h', contentHeight - 4);
+
+            Statistics();
+
+        });
+
+    }
+    
+    function ExitForAndroid() {
+        //如果是Android平台，则监听返回按钮事件
+        var plat = uexWidgetOne.getPlatform();
+        var exitv = 0;
+        if (plat) {
+            uexWindow.onKeyPressed = function (keyCode) {
+                if (keyCode == 0) {
+                    exitv++;
+                    //uexWidgetOne.exit();
+                    //uexWidgetOne.exit("0");
+                    if (exitv == 1) {
+                        appcan.window.openToast("再按一次，退出应用！", 3000);
+                        setTimeout("exitv = 0;", 3000);
+                    }
+                    else if (exitv == 2) {
+                        uexWidgetOne.exit("0");
+                    }
+
+                }
+            }
+            uexWindow.setReportKey(0, 1);
+        }
+    }
+
+    //动态显示未读消息总数
+    function UnReadNum(j) {
+        if (j == 0 || j == "NaN") {
+            $("#badge_0").hide();
+            $("#nav-left").html("消息");
+        } else if(j >= 99){
+            $("#badge_0").html("···");
+            $("#badge_0").show();
+        }else {
+            $("#badge_0").html(j);
+            $("#badge_0").show();
+            $("#nav-left").html("消息(" + j + ")");
+        }
+    }
+
+    function IndexInit(index) {
+        var tabview = appcan.tab({
+            selector: "#footer",
+            hasIcon: true,
+            hasAnim: false,
+            hasLabel: true,
+            hasBadge: true,
+            data: [{
+                label: "消息",
+                icon: "fa-comment",
+                badge: 1//"···"
+            }, {
+                label: "通讯录",
+                icon: "fa-book"
+            }, {
+                label: "首页",
+                icon: "fa-home"
+            }, {
+                label: "&nbsp;应用&nbsp;",
+                icon: "fa-th-large"
+            }, {
+                label: "&nbsp;&nbsp;&nbsp;我&nbsp;&nbsp;&nbsp;",
+                icon: "fa-user"
+            }]
+        });
+
+        tabview.on("click", function (obj, index) {
+            appcan.window.selectMultiPopover("content", index);
+        });
+
+        //appcan.getLocVal("BaseUrl"), "/QingDaoPortal/mhome/index"
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var HomeUrl = apiConfig.HomeUrl.Url;
+        appcan.frame.open({
+            id: "content",
+            url: [{
+                "inPageName": "MyMsgContent",
+                "inUrl": "MyMsgContent.html",
+            }, {
+                "inPageName": "MyContactContent",
+                "inUrl": "MyContactContent.html",
+            }, {
+                "inPageName": "MyHomeContent",
+                //"inUrl": "http://proj.istudy.sh.cn/qingdao/",//appcan.getLocVal("BaseUrl") + "/QingDaoPortal/",
+                "inUrl": HomeUrl,
+            }, {
+                "inPageName": "MyAppContent",
+                "inUrl": "MyAppContent" + appcan.getLocVal("UserType") + ".html"
+            }, {
+                "inPageName": "MyEEContent",
+                "inUrl": "MyEEContent.html",
+            }],
+            top: titHeight,
+            left: 0,
+            index: index,
+            change: function (index, res) {
+                //console.log(index+" "+res);
+                tabview.moveTo(res.multiPopSelectedIndex);
+            }
+        });
+
+        tabview.moveTo(index);
+    }
+
+    //获取联系人数据
+    function GetContactsInfo() {
+        var token = appcan.getLocVal("Token");
+        //var GetContactsInfoUrl = appcan.getLocVal("BaseUrl") + '/SEP.Contacts/api/Contact/Get?accessToken=' + token;//已修改
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        //var GetContactsInfoUrl = apiConfig.GetContactData.Url; 
+        var GetContactsInfoUrl = " http://221.224.83.111/SEP.Contacts/api/Contact/Get";
+        var ContactsInfoApiParameters = { "accessToken": token };
+        GetContactsInfoUrl = GetMappingUrl(GetContactsInfoUrl,ContactsInfoApiParameters);        
+        var Type = apiConfig.GetContactData.Type;
+        var isSuccess = 0;       
+        $.ajax({
+            url: GetContactsInfoUrl,
+            type: Type,
+            dataType: "json",
+            data: ContactsInfoApiParameters,
+            success: function (data) {
+                isSuccess = 1;
+                var contactsData = JSON.stringify(data);
+                localStorage.contactsData = contactsData;
+                //appcan.locStorage.setVal("contactsData", contactsData);
+            },
+            complete: function (xhr, type, error) {
+                if (isSuccess == 0) {
+                    //alert("获取联系人数据出错（002）!");
+                }
+            }
+        });//ajax结束
+    }//getContactsInfo()结束
+
+    appcan.button("#nav-left", "btn-act", function () {
+        IndexInit(0);
+    });
+
+    //全局退出
+    function ExitSys() {
+        setTimeout("appcan.window.close()", 1000);
+        appcan.locStorage.remove("Token");
+        appcan.window.open({ name: 'Logoff', data: 'Logoff.html', aniId: 5 });
+    }
+
+    //用户统计
+    function Statistics() {
+        //APPID、平台、用户ID、用户角色、记录时间、版本号
+        var appId = appcan.locStorage.val("appId");
+        if (appId != 001) {
+            //如果是Android平台，则监听返回按钮事件
+            var plat = uexWidgetOne.getPlatform();
+            if (plat == 0) {
+                platform = "iOS";
+            } else if (plat == 1) {
+                platform = "Android";
+            } else {
+                platform = "Unknow";
+            }
+            var version = appcan.locStorage.val("version");
+            var userType = appcan.locStorage.val("UserType");
+            var userId = appcan.locStorage.val("UserID");
+
+            var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+            var Type = apiConfig.StatisticsApi.Type;
+            var statisticsUrl = apiConfig.StatisticsApi.Url;
+            var statisticsApiParameters = { "AppId": appId, "Version": version, "Platform": platform, "UserRole": userType, "UserId": userId };
+            statisticsUrl = GetMappingUrl(statisticsUrl, statisticsApiParameters);
+            var isSuccess = 0;
+            $.ajax({
+                url: statisticsUrl,
+                type: Type,
+                dataType: "json",
+                data: statisticsApiParameters,
+                success: function (data) {
+                    isSuccess = 1;
+                },
+                complete: function (xhr, type, error) {
+                    if (isSuccess == 0) {
+                        setTimeout("Statistics()", 90000);
+                    }
+                }
+            });//ajax结束
+        }
+    }
+
+</script>
+</html>

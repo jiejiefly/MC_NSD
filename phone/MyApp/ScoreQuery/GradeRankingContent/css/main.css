@@ -1,0 +1,36 @@
+.bc-bgw {
+    background-color: white;
+}
+.first{
+    background-image:url('myImg/first.png');
+    background-size:80%;
+    background-repeat:no-repeat;
+}
+.second{
+    background-image:url('myImg/second.png');
+    background-size:80%;
+    background-repeat:no-repeat;
+}
+.third{
+    background-image:url('myImg/third.png');
+    background-size:80%;
+    background-repeat:no-repeat;
+}
+.circle-pic{
+    width:3em;
+    height:3em;
+    border-radius:6em; 
+}
+.pding{
+    padding:1em 0em 0em 0.625em;
+}
+.loading{
+    text-align:center;
+    padding-top: 4.75em;
+}
+.mar-t{
+    margin-top: 0.6em;
+}
+.ulev-tab {
+    font-size: 1.1em;
+}

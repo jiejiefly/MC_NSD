@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html ng-app ng-controller="contactController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>添加日常表现选择学生浮动窗口，获取改班级学生列表</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="../../css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../../css/ui-box.css">
+    <link rel="stylesheet" href="../../css/ui-base.css">
+    <link rel="stylesheet" href="../../css/ui-color.css">
+    <link rel="stylesheet" href="../../css/appcan.icon.css">
+    <link rel="stylesheet" href="../../css/appcan.control.css">
+    <link rel="stylesheet" href="StudentListContent/css/main.css">
+</head>
+<body class="um-vp bc-bg">
+    <div id="divLoading" class="ub-f1">
+        <div class="loading">
+            <span class="fa fa-spinner fa-pulse"></span>&nbsp;正在加载中，请稍后...
+        </div>
+    </div>
+    <div id="divContent" class="c-wh">
+        <div ng-repeat = "letter in ContactCodes" ng-cloak>
+            <div id="{{letter}}" class="uinn3 sc-bg bc-text toupper">{{letter}}</div>
+        <ul class="uinn-a7">
+            <li class="ubb ub bc-border bc-text ub-ac lis singleContact" ng-repeat="contact in Contacts" ng-if="contact.Code==letter ">
+                 <div class="lis-icon-s ub-img" style="background-image: url('StudentListContent/css/myImg/NoContactIcon.png')" ng-if="contact.ZP==''"></div>
+                 <div class="lis-icon-s ub-img" style="background-image: url('{{contact.ZP}}')" ng-if="contact.ZP!=''"></div>
+                 <div class="lv_title ub-f1 marg-l ub ub-ver ut-m line1 StudentName" StudentId = "{{contact.StudentId}}">{{contact.StudentName}}</div>
+            </li>
+        </ul>
+        </div>
+    </div>
+    <div class="indexBar ub ub-ver">
+        <div>A</div>
+        <div>B</div>
+        <div>C</div>
+        <div>D</div>
+        <div>E</div>
+        <div>F</div>
+        <div>G</div>
+        <div>H</div>
+        <div>I</div>
+        <div>J</div>
+        <div>K</div>
+        <div>L</div>
+        <div>M</div>
+        <div>N</div>
+        <div>O</div>
+        <div>P</div>
+        <div>Q</div>
+        <div>R</div>
+        <div>S</div>
+        <div>T</div>
+        <div>U</div>
+        <div>V</div>
+        <div>W</div>
+        <div>X</div>
+        <div>Y</div>
+        <div>Z</div>
+    </div>
+    <script src="../../js/appcan.js"></script>
+    <script src="../../js/appcan.control.js"></script>
+    <script src="../../js/appcan.listview.js"></script>
+    <script src="../../js/angular.min.js"></script>
+    <script src="../../js/Common.js"></script>
+</body>
+<script>
+    appcan.ready(function () {
+        $("#divLoading").hide();
+        $("#divContent").show();
+        $(".uinn-a7 li").on("touchstart", function () {
+            $(this).addClass("sc-bg-active");
+            setTimeout("$('.uinn-a7 li').removeClass('sc-bg-active');", 300);
+        });
+
+        var x = parseInt($('#divContent').offset().width); //480
+        var em = $('#divContent').css('font-size');//24px
+        var w = 1.5 * parseInt(em);//1.4 * 24
+        var h = appcan.getLocVal('StudentListHeight') + "px";//622
+
+        $(".indexBar").css({ position: "fixed", top: "0", left: (x - w) + "px", height: h, width: w + "px", "z-index": "99999" });
+        //$(".indexBar").css("z-index","99999");
+        $(".indexBar div").addClass("ub-f1").css({ "text-align": "center" });
+
+        $(".indexBar div").on("touchstart", function () {
+            $(".indexBar").addClass("sc-bg-active");
+            var txt = $(this).html();
+            if (txt == "↑") location.href = "#addContact";
+            else location.href = "#" + txt;
+        });
+
+        $(".indexBar").on("touchmove", function () {
+            event.preventDefault();
+            var touch = event.touches[0];
+            var touchY = touch.pageY;
+            var childLen = $(".indexBar div").length;
+            var indexBarH = $(".indexBar").offset().height;
+            var txt;
+            var minY;
+            var maxY;
+
+            $(".indexBar div").each(function (i) {
+
+                minY = i * (indexBarH / childLen) + 1;
+                maxY = (i + 1) * (indexBarH / childLen);
+                if (touchY >= minY && touchY <= maxY) {
+                    txt = $(this).html();
+                    if (txt == "↑") location.href = "#addContact";
+                    else location.href = "#" + txt;
+                    return false;
+                }
+            });
+
+            if (txt != undefined) {
+                appcan.window.openToast("  " + txt + "  ", 9000000);
+            }
+
+        });
+        $(".indexBar").on("touchend", function () {
+            $('.indexBar').removeClass('sc-bg-active');
+            appcan.window.closeToast();
+        });
+
+        $(".singleContact").on("click", function () {
+            var StudentName = $(this).find(".StudentName").html();
+            var StudentId = $(this).find(".StudentName").attr("StudentId");
+            appcan.window.evaluatePopoverScript({
+                name: "AddPer",
+                popName: "content",
+                scriptContent: "GetStudent('" + StudentName + "','" + StudentId + "')"
+            });
+            appcan.window.evaluateScript({
+                name: "StudentList",
+                scriptContent:"CloseStudentList()"
+            });
+        });
+    });
+
+    var ClassID = appcan.locStorage.val("ClassID");
+    function contactController($scope,$http) {
+        var isSuccess = 0;
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var Type = apiConfig.GetDailyPerStudent.Type;
+        var Url = apiConfig.GetDailyPerStudent.Url;
+        var parameters = { "classId": ClassID };
+        var url = GetMappingUrl(Url, parameters);
+        $.ajax({
+            url: url,
+            type: Type,
+            async: false,
+            data: parameters,
+            dataType: "json",
+            success: function (data) {
+                isSuccess = 1;
+                appcan.locStorage.setVal("Contacts",data);
+                var Data = appcan.getLocVal("Contacts");
+                $scope.Contacts = JSON.parse(Data);
+                $scope.$apply();
+            },
+            complete: function (xhr, type, error) {
+                if (isSuccess == 0) {
+                    var LatestTopOneContactsData = appcan.getLocVal("Contacts");
+                    var LatestTopOneContacts = JSON.parse(LatestTopOneContactsData);
+                    $scope.Contacts = LatestTopOneContacts;
+                    $scope.$apply();
+                }
+            }
+        });
+        $scope.ContactCodes = [];
+        DistinctCode($scope.Contacts);
+        function DistinctCode(Contacts) {
+            for (var j = 0; j < Contacts.length; j++) {
+                var contact = Contacts[j].Code;
+                if ($scope.ContactCodes.indexOf(contact) < 0) {
+                    $scope.ContactCodes.push(contact);
+                }
+            }
+        }
+    };//控制器结束
+
+    $(function () {
+        $("ul li:last-child").css({ "border-bottom": "#FFFFFF" });
+    });
+
+</script>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html ng-app ng-controller="KqqkController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>添加考勤情况浮动窗口</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="../../css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../../css/ui-box.css">
+    <link rel="stylesheet" href="../../css/ui-base.css">
+    <link rel="stylesheet" href="../../css/ui-color.css">
+    <link rel="stylesheet" href="../../css/appcan.icon.css">
+    <link rel="stylesheet" href="../../css/appcan.control.css">
+    <link rel="stylesheet" href="AddAttendanceContent/css/main.css">
+</head>
+<body class="um-vp bc-bg">
+    <div id="listview2" class="ubt  bc-border c-wh umar-at1 uinn-a7">
+        <ul>
+            <li class=" ub bc-border bc-text ub-ac lis" id="student" data-index="1">
+                <div class="lv_title ub-f1 marg-l ub ub-ver ut-m line1 uinn">
+                    学生
+                </div>
+                <div class="tx-r sc-text  umar-r lv_subTitle" id="divStudent">
+                    请选择
+                </div>
+                <div class="fa fa-angle-right ulev2 sc-text"></div>
+            </li>
+        </ul>
+    </div>
+    <div class="conbor consj uof" ng-cloak>
+        <div class="c-wh ubt bc-border uinput ub ub-pc ub-ac ub-f1 btn" id="btn1">
+            <div class="ub ub-ac ub-pc">到校时间(24H)</div>
+            <input value="{{TimeData[0].ReferenceInTimeHour}}" type="text" class="ub-f1 font-c tx-r hour1" id="addHour1" readonly="true">
+            <div>:</div>
+            <input value="{{TimeData[0].ReferenceInTimeMinute}}" type="text" class="ub-f1 font-c Minute1" id="addMinute1" readonly="true">
+        </div>
+        <div class="c-wh ubt ubb bc-border uinput ub ub-pc ub-ac ub-f1 btn" id="btn2">
+            <div class="ub ub-ac ub-pc">离校时间(24H)</div>
+            <input value="{{TimeData[0].ReferenceOutTimeHour}}" type="text" class="ub-f1 font-c tx-r hour2" id="addHour2" readonly="true">
+            <div>:</div>
+            <input value="{{TimeData[0].ReferenceOutTimeMinute}}" type="text" class="ub-f1 font-c Minute2" id="addMinute2" readonly="true">
+        </div>
+    </div>
+    <br>
+    <div class="uin uinn">
+        <div class="btn ub ub-ac bc-text-head ub-pc bc-btn uc-a1" id="submit">提 交</div>
+    </div>
+    </br>
+    <script src="../../js/appcan.js"></script>
+    <script src="../../js/appcan.control.js"></script>
+    <script src="../../js/angular.min.js"></script>
+    <script src="../../js/Common.js"></script>
+</body>
+<script>
+    var btnID = "";
+    var StudentID;
+    var StudentName;
+    var TeacherId;
+    var TeacherName;
+    var Time;
+    appcan.ready(function () {
+        appcan.button("#student", "btn-act3", function () {
+            appcan.window.open("StudentList", "StudentList.html", 5)
+        })
+
+        uexControl.cbOpenTimePicker = function (opCode, dataType, data) {
+            var Time = eval('(' + data + ')');
+            if (btnID == "btn1") {
+                var addHour1 = JSON.stringify(Time.hour);
+                var addMinute1 = JSON.stringify(Time.minute);
+                if (addHour1.length < 2) {
+                    addHour1 = '0' + addHour1;
+                }
+                if (addMinute1.length < 2) {
+                    addMinute1 = '0' + addMinute1;
+                }
+                $("#addHour1").val(addHour1);
+                $("#addMinute1").val(addMinute1);
+            }
+            else {
+                var addHour2 = JSON.stringify(Time.hour);
+                var addMinute2 = JSON.stringify(Time.minute);
+                if (addHour2.length < 2) {
+                    addHour2 = '0' + addHour2;
+                }
+                if (addMinute2.length < 2) {
+                    addMinute2 = '0' + addMinute2;
+                }
+                $("#addHour2").val(addHour2);
+                $("#addMinute2").val(addMinute2);
+            }
+        };
+    });
+
+    function KqqkController($scope, $http) {
+        var isSuccess = 0;
+        var Token = appcan.getLocVal("Token");
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var Type = apiConfig.GetAttendanceStandardTime.Type;
+        var Url = apiConfig.GetAttendanceStandardTime.Url;
+        var parameters = { "token": Token };
+        var url = GetMappingUrl(Url, parameters);
+        $.ajax({
+            url: url,
+            type: Type,
+            data: parameters,
+            dataType: "json",
+            success: function (data) {
+                isSuccess = 1;
+                $scope.TimeData = data;
+                appcan.locStorage.setVal("TimeData",data);
+                $scope.$apply();
+            },
+            complete: function (xhr, type, error) {
+                if (isSuccess == 0) {
+                    appcan.ready(function () {
+                        appcan.window.openToast({
+                            msg: '加载最新数据失败',
+                            duration: '2000',
+                            position: '5',
+                            type: '0'
+                        });
+                    });
+                }
+            }
+        });
+       
+        $("#submit").on("click", function () {
+
+            isSuccess = 0;
+            var Time = JSON.parse(appcan.locStorage.getVal("TimeData"));
+            var InTime = $("#addHour1").val() + ":" + $("#addMinute1").val();
+            var OutTime = $("#addHour2").val() + ":" + $("#addMinute2").val();
+            var inTime = Time[0].ReferenceInTimeHour + ":" + Time[0].ReferenceInTimeMinute;
+            var outTime = Time[0].ReferenceOutTimeHour + ":" + Time[0].ReferenceOutTimeMinute;
+            var userType = appcan.getLocVal("UserType");
+            var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+            var Type = apiConfig.PutAttendance.Type;
+            var Url = apiConfig.PutAttendance.Url;
+            var parameters ={ "teacherId": TeacherId, "teacherName": TeacherName, "studentId": StudentID, "studentName": StudentName, "inTime": InTime, "outTime": OutTime };
+            var url = GetMappingUrl(Url, parameters);
+            if (StudentName == undefined) {
+                alert("请选择学生！");
+            }
+            else if (InTime <= inTime && OutTime >= outTime ) {
+                alert("未迟到/早退，提交无效！");
+                return;
+            }
+            else if (InTime >= OutTime){
+                alert("无效时间！");
+            }
+            else if (Time[0].ReferenceInTimeHour > $("#addHour1").val() || (Time[0].ReferenceInTimeHour == $("#addHour1").val()) && (Time[0].ReferenceInTimeMinute > $("#addMinute1").val())) {
+                alert("未迟到,提交无效！");
+            }
+            else if (Time[0].ReferenceOutTimeHour < $("#addHour2").val() || (Time[0].ReferenceOutTimeHour == $("#addHour2").val()) && (Time[0].ReferenceOutTimeMinute < $("#addMinute2").val())) {
+                alert("未早退,提交无效！");
+            }
+            else {
+                $.ajax({
+                    url: url,
+                    type: Type,
+                    data: parameters,
+                    dataType: "json",
+                    success: function (data) {
+                        isSuccess = 1;
+                        appcan.window.alert({
+                            title: '提示',
+                            content: '数据提交成功！',
+                            buttons: '继续'
+                        });
+                        if (isSuccess == 1) {
+                            appcan.window.evaluateScript({
+                                name: "Attendance",
+                                scriptContent: "Refurbish()"
+                            });
+                            appcan.window.evaluateScript({
+                                name: "AddAttendance",
+                                scriptContent: "Close()"
+                            });
+                        }
+                    },
+                    complete: function (xhr, type, error) {
+                        if (isSuccess == 0) {
+                            appcan.ready(function () {
+                                appcan.window.openToast({
+                                    msg: '加载最新数据失败',
+                                    duration: '2000',
+                                    position: '5',
+                                    type: '0'
+                                });
+                            });
+                        }
+                    }
+                });
+             
+            }
+        })
+    }
+
+    function GetData(name, id, Tname, Tid) {
+        $("#divStudent").html(name);
+        StudentName = name;
+        StudentID = id;
+        TeacherId = JSON.parse(Tid);
+        TeacherName = Tname;
+    }
+
+    appcan.button(".btn", "ani-act", function () {
+        switch (this.id) {
+            case "btn1":
+                uexControl.openTimePicker($('#addHour1').val(), $('#addMinute1').val());
+                btnID = 'btn1';
+                break;
+            case "btn2":
+                uexControl.openTimePicker($('#addHour2').val(), $('#addMinute2').val());
+                btnID = 'btn2';
+                break;
+        }
+    })
+
+</script>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html ng-app ng-controller="StudentsLeaveController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>学生、家长 学生请假功能浮动窗口</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/ui-box.css">
+    <link rel="stylesheet" href="../css/ui-base.css">
+    <link rel="stylesheet" href="../css/ui-color.css">
+    <link rel="stylesheet" href="../css/appcan.icon.css">
+    <link rel="stylesheet" href="../css/appcan.control.css">
+    <link rel="stylesheet" href="StudentsLeaveContent/css/main.css">
+</head>
+<body class="um-vp bc-bg" ontouchstart>
+    <div id="divLoading" class="ub-f1">
+        <div class="loading">
+            <span class="fa fa-spinner fa-pulse"></span>&nbsp;正在加载中，请稍后...
+        </div>
+    </div>
+    <div id="divContent" style="display:none;">
+        <div class="bc-bg" ng-if="NoData==1">
+            <div class="NoDataImg_box ">
+                <div class="NoDataImg_bg"></div>
+            </div>
+            <div class="NoData_box NoData_color">抱歉，暂时没有您要查看的数据！</div>
+        </div>
+        <div class=" bc-border t-bla ub-ac lis iden c-wh">
+            <div class=" ubb  bc-border t-bla ub-ac lis iden c-wh" ng-repeat="data in XSQJData" ng-if="NoData!=1">
+                <div class="ub ub-pj">
+                    <div class="ub  ut-m umar-t tx-r">{{data.Applicant}}同学{{data.Type}}申请</div>
+                    <div class="ub  ut-m umar-t  sc-text ulev-1">{{data.ApplyDate}}</div>
+                </div>
+                <div class="ub ub-pj">
+                    <div class="ub ub-ver ut-m sc-text umar-t  ulev-1">{{data.Content}}</div>
+                </div>
+                <div class="ub  ub-pj">
+                    <div class="ub ub-ver ut-m umar-t tx-r ulev-1">起:{{data.BeginTime}}</div>
+                    <div class="ub ub-ver ut-m umar-t ulev-1">止:{{data.EndTime}}</div>
+                </div>
+                <div class="ub ub-pj">
+                    <div class="ub ub-ver ut-m umar-t ulev-1" ng-if="data.Status == '0' || data.Status == '1'">{{data.Comment}}</div>
+                    <div class="ub">
+                        <div class="ub ub-ver ut-m umar-t bc-text-head c-orange uc-a1 ulev-1" style="padding: 0.3em;" ng-if="data.Status == '0'">未通过</div>
+                        <div class="ub ub-ver ut-m umar-t bc-text-head c-green uc-a1 ulev-1" style="padding: 0.3em;" ng-if="data.Status == '1'">已通过</div>
+                        <div class="ub ub-ver ut-m umar-t bc-text-head c-blue uc-a1 ulev-1" style="padding: 0.3em;" ng-if="data.Status == '2'">审批中</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/appcan.js"></script>
+    <script src="../js/appcan.control.js"></script>
+    <script src="../js/angular.min.js"></script>
+    <script src="../js/Common.js"></script>
+</body>
+<script>
+    appcan.ready(function () {
+        $("#divLoading").hide();
+        $("#divContent").show();
+    })
+
+    function StudentsLeaveController($scope, $http) {
+        var isSuccess = 0;
+        var Token = appcan.getLocVal("Token");
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var Type = apiConfig.GetStudentsLeaveStu.Type;
+        var Url = apiConfig.GetStudentsLeaveStu.Url;
+        var parameters = { "token": Token };
+        var url = GetMappingUrl(Url, parameters);
+        $.ajax({
+            url: url,
+            type: Type,
+            data: parameters,
+            dataType: "json",
+            success: function (data) {
+                isSuccess = 1;
+                $scope.XSQJData = data;
+                $scope.$apply();
+                appcan.locStorage.setVal("XSQJData", data);
+                if (appcan.locStorage.getVal("XSQJData") == "[]") {
+                    $scope.NoData = 1;
+                    $scope.$apply();
+                }
+
+            },
+            complete: function () {
+                if (isSuccess == 0) {
+                    var LatestTopOneStudentsLeaveData = appcan.locStorage.getVal("XSQJData");
+                    var LatestTopOneStudentsLeave = JSON.parse(LatestTopOneStudentsLeaveData);
+                    $scope.XSQJData = LatestTopOneStudentsLeave;
+                    $scope.$apply();
+                    appcan.ready(function () {
+                        appcan.window.openToast({
+                            msg: '加载最新数据失败',
+                            duration: '2000',
+                            position: '5',
+                            type: '0'
+                        });
+                    });
+                }
+            }
+        });
+    }
+
+</script>
+</html>

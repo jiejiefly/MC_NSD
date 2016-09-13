@@ -1,0 +1,348 @@
+﻿<!DOCTYPE html>
+<html ng-app ng-controller="MsgController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>消息页面</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="css/ui-box.css">
+    <link rel="stylesheet" href="css/ui-base.css">
+    <link rel="stylesheet" href="css/ui-color.css">
+    <link rel="stylesheet" href="css/appcan.icon.css">
+    <link rel="stylesheet" href="css/appcan.control.css">
+    <link rel="stylesheet" href="MyMsgContent/css/main.css">
+</head>
+<body class="um-vp bc-bg" ontouchstart>
+    <div id="NetworkState"></div>
+    <div id="loading" class="ub-f1">
+        <div class="loading">
+            <span class="fa fa-spinner fa-pulse"></span>&nbsp;正在加载中，请稍后...
+        </div>
+    </div>
+    <div id="divContent1" class="c-wh" style="display:none;">
+        <div class="bc-bg" id="NoData" ng-if="NoData==1">
+            <div class="NoDataImg_box">
+                <div class="NoDataImg_bg"></div>
+            </div>
+            <div class="NoData_box NoData_color">
+                抱歉，暂时没有您要查看的数据！
+            </div>
+        </div>
+        <ul ng-if="NoData!=1">
+            <li class="ubb ub bc-border t-bla ub-ac lis msgClass" ng-repeat="msg in LastMsg" appid="{{msg.Application.Id}}">
+                <div class="ub lis-icon-m ub-img imageRadius" appiconid="{{msg.Application.Id}}"></div>
+                <div class="ub-f1 ub ub-pj ub-ac">
+                    <ul class="ub-f1 ub ub-ver marg-l">
+                        <li class="bc-text ub ub-ac line1">
+                            <div class="ub-f1 ut-s umar-b" ng-if="msg.Application.Name==''||msg.Application.Name==null">其他应用</div>
+                            <div class="ub-f1 ut-s umar-b" ng-if="msg.Application.Name!=''&&msg.Application.Name!=null">{{msg.Application.Name}}</div>
+                            <div class="ulev-4 sc-text mab">{{msg.MessageTime|date : 'yyyy-MM-dd HH:mm'}}</div>
+                        </li>
+                        <li class="bc-text ub ub-ac line1">
+                            <div class="ub-f1 ulev-1 sc-text ut-s">{{msg.Title}}</div>
+                            <div class="ulev-4 bc-text-head sc-bg-alert tab_badge1 UnReadCount" ng-repeat="count in URCount" ng-if="count.ApplicationId==msg.Application.Id">
+                                {{count.UnReadCount}}
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <script src="js/appcan.js"></script>
+    <script src="js/appcan.control.js"></script>
+    <script src="js/appcan.listview.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/Common.js"></script>
+    <!-- <script src="JsonData/messageData.js"></script> -->
+</body>
+<script>
+    
+    var j = 0;
+    var AllAppIdJson = [{ "通知公告": "e6d44320-7deb-4fec-9f7d-b5b55c7a6d73", "成绩查询": "7f6b4c18-e26f-4f01-a9e2-68796fd81023", "行政办公": "76014e09-c57c-4ec4-aff8-d7600a0885d0", "出勤情况": "e923e0ae-dbae-47b7-bcd1-2398ef2ca3ae", "日常表现": "d923e0ae-dbae-47b7-bcd1-2398ef2ca3ad", "今日作业": "f923e0ae-dbae-47b7-bcd1-2398ef2ca3af" }];
+    var AllAppId = JSON.stringify(AllAppIdJson);
+    
+    function MsgController($scope) {
+        //BindingLatestTopOneMsgData($scope)
+        var isSuccess = 0;
+        $scope.NoData = 0;
+        
+        var userId = appcan.locStorage.val("UserID");
+        var Token = appcan.locStorage.val("Token");
+
+        //var GetLatestTopOneUrl = BaseUrl + '/MessageCenter.WebApiService/api/user/' + userId + '/Messages/LatestTopOne/GroupByApp?accessToken=' + Token;
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var GetLatestTopOneType = apiConfig.GetLatestTopOne.Type;
+        var LatestTopOneApiParameters = { "UserId": userId, "accessToken": Token };
+
+        var GetLatestTopOneUrl = apiConfig.GetLatestTopOne.Url;
+        GetLatestTopOneUrl = GetMappingUrl(GetLatestTopOneUrl, LatestTopOneApiParameters);
+       
+        $.ajax({
+            url: GetLatestTopOneUrl,
+            type: GetLatestTopOneType,
+            dataType: "json",
+            data: LatestTopOneApiParameters,
+            success: function (data) {
+               
+                isSuccess = 1;
+                localStorage.MsgData = JSON.stringify(data);
+                if (data == '') {
+                    $scope.NoData = 1;
+                    $scope.$apply();
+                }
+            },
+            complete: function () {
+                if (isSuccess != 1) {
+                    BindingLatestTopOneMsgData($scope);
+                    touchEvent();
+                    //alert("获取消息中心数据失败（005）");
+                    isSuccess = 0;
+                } else {
+                    BindingLatestTopOneMsgData($scope);
+                    touchEvent();
+                }
+            }
+        });
+
+        //var GetUnReadCountUrl = BaseUrl + '/MessageCenter.WebApiService/api/user/' + userId + '/Messages/UnRead/Count/GroupByApp';
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var GetUnReadCountUrl = apiConfig.GetUnReadCount.Url;
+        var UnReadCountApiParameters = { "userId": userId, "accessToken": Token };
+        GetUnReadCountUrl = GetMappingUrl(GetUnReadCountUrl, UnReadCountApiParameters);
+        var GetUnReadCountType = apiConfig.GetUnReadCount.Type;
+        $.ajax({
+            url: GetUnReadCountUrl,
+            type: GetUnReadCountType,
+            dataType: "json",
+            data: UnReadCountApiParameters,
+            success: function (data) {
+                isSuccess = 1;
+                $scope.URCount = data;
+                $scope.$apply();
+                localStorage.UnReadCount = JSON.stringify(data);
+                var UnReadCountData = data;
+                for (var i = UnReadCountData.length - 1; i >= 0; i--) {
+                    j += UnReadCountData[i].UnReadCount;
+                }
+                localStorage.UnReadCountSum = j;
+            },
+            complete: function () {
+                if (isSuccess != 1) {
+                    //alert("获取消息中心数据失败（004）");
+                    isSuccess = 0;
+                }
+            }
+        });
+
+        appcan.ready(function () {
+            UnRead(j);
+            NetworkState();
+            ReFresh($scope, GetUnReadCountUrl,GetUnReadCountType, GetLatestTopOneUrl, GetLatestTopOneType)
+            $("#divContent1").show();
+            $("#loading").hide();
+            touchEvent();
+        });
+    }//controller结束
+
+    function BindingLatestTopOneMsgData($scope) {
+        var LatestTopOneMsgData = localStorage.MsgData;
+        if (LatestTopOneMsgData == [] || LatestTopOneMsgData == '' || LatestTopOneMsgData == null) {
+            $scope.NoData = 1;
+            $scope.$apply();
+        }
+        var LatestTopOneMsg = JSON.parse(LatestTopOneMsgData);
+        $scope.LastMsg = LatestTopOneMsg;
+        $scope.$apply();
+        for (var i in LatestTopOneMsg) {
+            if (AllAppId.indexOf(LatestTopOneMsg[i].Application.Id) != -1) {
+                $(function () {
+                    $("[appIconId='" + LatestTopOneMsg[i].Application.Id + "']").css("background-image", "url('MyMsgContent/css/myImg/" + LatestTopOneMsg[i].Application.Id + ".png')");
+                })
+            } else {
+                $(function () {
+                    $("[appIconId='" + LatestTopOneMsg[i].Application.Id + "']").css("background-image", "url('MyMsgContent/css/myImg/others.png')");
+                })
+            }
+        }
+    }
+
+    function SetMsgRead(appId) {
+        var userId = appcan.locStorage.val("UserID");
+        var Token = appcan.locStorage.val("Token")
+        //var SetMsgReadUrl = appcan.locStorage.val("BaseUrl3") + '/MessageCenter.WebApiService/api/envelope/open/app';
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var SetMsgReadUrl = apiConfig.SetMsgRead.Url;
+        var SetMsgReadType = apiConfig.SetMsgRead.Type;
+        var SetMsgReadApiParameters = { "UserId": userId, "AppId": appId, "accessToken": Token };
+        SetMsgReadUrl = GetMappingUrl(SetMsgReadUrl, SetMsgReadApiParameters);
+        $.ajax({
+            url: SetMsgReadUrl,
+            type: SetMsgReadType,
+            data: SetMsgReadApiParameters,
+            dataType: "json",
+            success: function (data, status, xhr) {
+                var isSuccess = 1;
+            },
+            complete: function () {
+                if (isSuccess != 1) {
+                    //alert("获取消息中心数据失败（006）");
+                }
+            }
+        });
+    }
+
+    //未读左上角左下角未读消息总数
+    function UnRead(j) {
+        appcan.window.evaluateScript({
+            name: "MainTab",
+            scriptContent: "UnReadNum('" + j + "')"
+        });
+    }
+
+    function ReFresh($scope, GetUnReadCountUrl, GetUnReadCountType, GetLatestTopOneUrl, GetLatestTopOneType) {
+        NetworkState();
+        var Token = appcan.locStorage.val("Token");
+        setInterval("UnReadCount()", 10000);//自动刷新
+        appcan.frame.setBounce(0, function (type) {
+        }, function (type) {
+        }, function (type) {
+            setTimeout(function (type) {
+                appcan.frame.resetBounce(type);
+                
+                //未读数量刷新
+                $.ajax({
+                    url: GetUnReadCountUrl,
+                    type: GetUnReadCountType,
+                    dataType: "json",
+                    data: { "accessToken": Token },
+                    success: function (data) {
+                        isSuccess = 1;
+                        $scope.URCount = data;
+                        $scope.$apply();
+                        localStorage.UnReadCount = data;
+                        UnReadCountData = data;
+                    },
+                    complete: function () {
+                        if (isSuccess != 1) {
+                            //alert("获取消息中心数据失败（007）");
+                            isSuccess = 0;
+                        } else {
+                            var j = 0;
+                            for (var i = UnReadCountData.length - 1; i >= 0; i--) {
+                                j += UnReadCountData[i].UnReadCount;
+                            }
+                            localStorage.UnReadCountSum = j;
+                            UnRead(j);
+                            isSuccess = 0;
+                        }
+                    }
+                });
+
+                //未读消息刷新
+                $.ajax({
+                    url: GetLatestTopOneUrl,
+                    type: GetLatestTopOneType,
+                    dataType: "json",
+                    data: { "accessToken": Token },
+                    success: function (data) {
+                        isSuccess = 1;
+                        localStorage.MsgData = JSON.stringify(data);
+                    },
+                    complete: function () {
+                        if (isSuccess != 1) {
+                            //alert("获取消息中心数据失败（008）");
+                            isSuccess = 0;
+                        } else {
+                            BindingLatestTopOneMsgData($scope)
+                            touchEvent();
+                            isSuccess = 0;
+                        }
+                    }
+                });
+            }, 1000);
+        })
+    }
+
+    function touchEvent() {
+        $(function () {
+            $("#divContent1>ul>li").on("click", function () {
+                $(this).addClass("sc-bg-active");
+                setTimeout("$('#divContent1>ul>li').removeClass('sc-bg-active');", 300);
+            });
+
+            $(".msgClass").on("click", function () {
+                var AppId = $(this).attr("AppId");
+                appcan.locStorage.setVal("AppId", AppId);
+                if (AppId == "e6d44320-7deb-4fec-9f7d-b5b55c7a6d73") {
+                    appcan.window.open("Notice", "MyApp/Notice.html", 5);
+                } else {
+                    appcan.window.open("MsgCenter", "MyMsg/MsgCenter.html", 2);
+                }
+                var UnReadCountSum = appcan.locStorage.val("UnReadCountSum");
+                if (UnReadCountSum != 0) {
+                    var n = $(this).find(".UnReadCount").html();
+                    UnReadCountSum = UnReadCountSum - n;
+                    UnRead(UnReadCountSum);
+                    $(this).find(".UnReadCount").html(0).hide();//点击后把未读数量标记为0，并隐藏
+                    SetMsgRead(AppId);
+                }
+            });
+        })
+    }
+
+    function UnReadCount() {
+        NetworkState();
+        var userId = appcan.locStorage.val("UserID");
+        var BaseUrl = appcan.locStorage.val("BaseUrl3");
+        var Token = appcan.locStorage.val("Token");
+        //var GetUnReadCountUrl = BaseUrl + '/MessageCenter.WebApiService/api/user/' + userId + '/Messages/UnRead/Count/GroupByApp';
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var GetUnReadCountUrl = apiConfig.GetUnReadCount.Url;
+        var UnReadCountApiParameters = { "UserId": userId, "accessToken": Token };
+        GetUnReadCountUrl = GetMappingUrl(GetUnReadCountUrl, UnReadCountApiParameters);
+        var GetUnReadCountType = apiConfig.GetUnReadCount.Type;
+        var isSuccess = 0;
+        //未读数量刷新
+        $.ajax({
+            url: GetUnReadCountUrl,
+            type: GetUnReadCountType,
+            dataType: "json",
+            data: { "accessToken": Token },
+            success: function (data) {
+                isSuccess = 1;
+                localStorage.UnReadCount = data;
+                UnReadCountData = data;
+            },
+            complete: function () {
+                if (isSuccess == 1) {
+                    var j = 0;
+                    for (var i = UnReadCountData.length - 1; i >= 0; i--) {
+                        j += UnReadCountData[i].UnReadCount;
+                    }
+                    localStorage.UnReadCountSum = j;
+                    UnRead(j);
+                    isSuccess = 0;
+                }
+            }
+        });
+    }
+
+    function NetworkState() {
+        //appcan.device.getInfo(13, function (err, data, dataType, optId) {
+        //    var netStatus = JSON.parse(data);
+        //    if (netStatus.connectStatus == "-1")//-1：网络不可用，0：WIFI 1：3G，2：2G
+        //    {
+        //        //网络不可用
+        //        var NoNetwork = '<div class="tx-c umh4 NoNetworkColor diyLineHeight" id="NoNetwork">网络不可用，请检查网络设置！</div>';
+        //        $("#NetworkState").html(NoNetwork);
+        //    }
+        //    else {
+                $("#NoNetwork").hide();
+        //    }
+        //});
+    }
+
+</script>
+</html>

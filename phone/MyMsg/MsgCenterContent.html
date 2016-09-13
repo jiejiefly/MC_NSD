@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html ng-app = "MsgCenterApp" ng-controller="MsgCenterggController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>消息详情浮动页面</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/ui-box.css">
+    <link rel="stylesheet" href="../css/ui-base.css">
+    <link rel="stylesheet" href="../css/ui-color.css">
+    <link rel="stylesheet" href="../css/appcan.icon.css">
+    <link rel="stylesheet" href="../css/appcan.control.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body class="um-vp bc-bg" ontouchstart>
+    <div id="loading" class="ub-f1">
+        <div class="loading">
+            <span class="fa fa-spinner fa-pulse"></span>&nbsp;正在加载中，请稍后...
+        </div>
+    </div>
+    <div id="divContent1" style="display:none;">
+        <div class="ub bc-bg uinn-m">
+            <div class="right ub-f1 ub ub-ver" id="MsgCenterContent">
+                <div class="diyTop" ng-repeat="data in MsgCenterData">
+                    <div class="ulev-0 tit diyWidth">
+                        <div class="diyText tx-c">{{data.MessageTime|date : 'yyyy-MM-dd HH:mm'}}</div>
+                    </div>
+                    <div class="ub ub-ac">
+                        <div class="ub ub-f1">
+                            <div class="c-wh lcontent uinn ub-f1 uc-a1">
+                                <div class="ulev-1">
+                                    <p class="diyFontSize wordBreak1">
+                                        {{data.Title}}
+                                    </p>
+                                    <p class="diyTop sc-text ulev1 img" ng-bind-html="data.Content|to_trusted"></p>
+                                    <!--<p class="diyTop sc-text ulev1 wordBreak1 imgs" ng-if="data.Content.indexOf('img')!=-1">{{data.Content|to_trusted}}</p>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="../js/appcan.js"></script>
+<script src="../js/appcan.control.js"></script>
+<script src="../js/appcan.slider.js"></script>
+<script src="../js/angular.min.js"></script>
+<script src="../js/Common.js"></script>
+<script>
+    //function MsgCenterggController($scope, $http) 
+    var MsgCenterModule = angular.module("MsgCenterApp", []);
+    //控制器开始
+    MsgCenterModule.controller("MsgCenterggController",["$scope",function($scope) {
+        var AppId = appcan.locStorage.val("AppId");
+        var UserId = appcan.locStorage.val("UserID");
+        var Token = appcan.locStorage.val("Token");
+        //var AppMsgDataUrl = appcan.locStorage.val("BaseUrl3") + '/MessageCenter.WebApiService/api/user/' + UserId + '/Messages/' + AppId;
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var Url = apiConfig.GetAppMsg.Url;
+        var parameters = { "UserId": UserId, "AppId": AppId, "accessToken": Token };
+        Url = GetMappingUrl(Url, parameters);
+        var Type = apiConfig.GetAppMsg.Type;
+        var isSuccess = 0;
+        $.ajax({
+            url: Url,
+            type: Type,
+            dataType: "json",
+            data: parameters,
+            success: function (data) {
+                isSuccess = 1;
+                $scope.MsgCenterData = data;
+                $scope.$apply();
+                box($scope);
+            },
+            complete: function () {
+                if (isSuccess != 1) {
+                    appcan.window.openToast("获取消息列表出错（008）！", 2000);
+                }
+            }
+        });
+        appcan.ready(function () {
+            $("#MsgCenterContent :first-child").removeClass("diyTop");
+            $("#loading").hide();
+            $("#divContent1").show();
+        });
+
+        function box() {            
+            var imgUrl = "http://221.224.83.111" + $(".img").find("img").attr("src");
+            $(".img").find("img").attr("src", imgUrl).css({"width":"18%","height":"auto"});
+            $scope.$apply();
+        }
+
+
+
+    }])
+
+    MsgCenterModule.filter('to_trusted', ['$sce', function ($sce) {
+        return function (text) {
+            return $sce.trustAsHtml(text);
+        };
+    }]);
+
+
+    
+    var imgUrl = "http://221.224.83.111" + $("#Content").find("img").attr("src");
+    $("#Content").find("img").attr("src", imgUrl);
+   
+</script>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html ng-app ng-controller="StudentsLeaveController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>添加日程安排窗口</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="../../css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../../css/ui-box.css">
+    <link rel="stylesheet" href="../../css/ui-base.css">
+    <link rel="stylesheet" href="../../css/ui-color.css">
+    <link rel="stylesheet" href="../../css/appcan.icon.css">
+    <link rel="stylesheet" href="../../css/appcan.control.css">
+    <link rel="stylesheet" href="AddSchedulingProgramContent/css/main.css">
+</head>
+<body class="um-vp bc-bg">
+    <div class="conbor consj uof" ng-cloak>
+
+        <li class=" lis c-wh ubb">
+            <div class="ulev-1 umar-b"> 事务主题</div>
+            <div class="uinput text-b uba">
+                <textarea class="Title " placeholder="事务主题" name="txt" clos="50" rows="1" id="title" ></textarea>
+            </div>
+        </li>
+        <li class=" lis c-wh ubb ">
+            <div class="ulev-1 umar-b"> 具体事务描述</div>
+            <div class="uinput text-b uba">
+                <textarea class="Content " placeholder="具体事务描述" name="txt" clos="50" rows="2" id="content" ></textarea>
+            </div>
+        </li>
+        <li class="ubb ub bc-border bc-text ub-ac lis c-wh" data-index="0">
+            <div class="ub-f1 marg-l ub ub-ver ut-m">
+            全天事务
+            </div>
+            <div class="switch uba bc-border switch-mini" data-checked="false">
+                <div class="switch-btn sc-bg-active "></div>
+            </div>
+        </li>
+
+        <div class="c-wh  bc-border uinput ub  ">
+            <div class=" ub ub-ac ub-pc ub-f1 ub-pj umar-l" style=" width: 17em;">开始时间(24H)</div>
+            <div class="ub ub-ac ub-pc ub-f1">
+                <div class="ub ub-f1 btn" id="btn3">
+                    <input style="display:none;" value="2015" type="text" class="ub-f1 tx-r font-c" id="addYear1" readonly="true">
+                    <input value="07" type="text" class="ub-f1 tx-r font-c" id="addMonth1" readonly="true">
+                    <div class="ub ub-ac">/</div>
+                    <input value="16" type="text" class="ub-f1 font-c" id="addDay1" readonly="true">
+                </div>
+
+                <div class="ub ub-f1 btn" id="btn1">
+                    <input value="09" type="text" class="ub-f1 font-c tx-r hour1" id="addHour1" readonly="true">
+                    <div class="ub ub-ac">:</div>
+                    <input value="30" type="text" class="ub-f1 font-c Minute1" id="addMinute1" readonly="true">
+                </div>
+            </div>
+        </div>
+        <div class="c-wh ubt bc-border uinput ub ubb ">
+            <div class=" ub ub-ac ub-pc ub-f1 ub-pj umar-l" style=" width: 17em;">结束时间(24H)</div>
+            <div class="ub ub-ac ub-pc ub-f1">
+                <div class="ub ub-f1 btn" id="btn4">
+                    <input style="display:none;" value="2015" type="text" class="ub-f1 tx-r font-c" id="addYear2" readonly="true">
+                    <input value="07" type="text" class="ub-f1 tx-r font-c" id="addMonth2" readonly="true">
+                    <div class="ub ub-ac">/</div>
+                    <input value="16" type="text" class="ub-f1 font-c" id="addDay2" readonly="true">
+                </div>
+
+                <div class="ub ub-f1 btn" id="btn2">
+                    <input value="09" type="text" class="ub-f1 font-c tx-r hour2" id="addHour2" readonly="true">
+                    <div class="ub ub-ac">:</div>
+                    <input value="30" type="text" class="ub-f1 font-c Minute2" id="addMinute2" readonly="true">
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="uin uinn">
+        <div class="btn ub ub-ac bc-text-head ub-pc bc-btn uc-a1" id="submit">提 交</div>
+    </div>
+    </br>
+    <script src="../../js/appcan.js"></script>
+    <script src="../../js/appcan.control.js"></script>
+    <script src="../../js/angular.min.js"></script>
+    <script src="../../js/Common.js"></script>
+    <script src="../../js/appcan.listview.js"></script>
+</body>
+<script>
+
+
+
+    appcan.ready(function () {
+        appcan.select(".select", function (ele, value) {
+
+        });
+
+        uexControl.cbOpenDatePicker = function (opCode, dataType, data) {
+            var obj = eval('(' + data + ')');
+            if (btnID == "btn3") {
+                var addYear1 = JSON.stringify(obj.year);
+                var addMonth1 = JSON.stringify(obj.month);
+                var addDay1 = JSON.stringify(obj.day);
+                if (addMonth1.length < 2) {
+                    addMonth1 = '0' + addMonth1;
+                }
+                if (addDay1.length < 2) {
+                    addDay1 = '0' + addDay1;
+                }
+                $("#addYear1").val(addYear1);
+                $("#addMonth1").val(addMonth1);
+                $("#addDay1").val(addDay1);
+            }
+            else {
+                var addYear2 = JSON.stringify(obj.year);
+                var addMonth2 = JSON.stringify(obj.month);
+                var addDay2 = JSON.stringify(obj.day);
+                if (addMonth2.length < 2) {
+                    addMonth2 = '0' + addMonth2;
+                }
+                if (addDay2.length < 2) {
+                    addDay2 = '0' + addDay2;
+                }
+                $("#addYear2").val(addYear2);
+                $("#addMonth2").val(addMonth2);
+                $("#addDay2").val(addDay2);
+            }
+        };
+
+        uexControl.cbOpenTimePicker = function (opCode, dataType, data) {
+            var Time = eval('(' + data + ')');
+            if (btnID == "btn1") {
+                var addHour1 = JSON.stringify(Time.hour);
+                var addMinute1 = JSON.stringify(Time.minute);
+                if (addHour1.length < 2) {
+                    addHour1 = '0' + addHour1;
+                }
+                if (addMinute1.length < 2) {
+                    addMinute1 = '0' + addMinute1;
+                }
+                $("#addHour1").val(addHour1);
+                $("#addMinute1").val(addMinute1);
+            }
+            else {
+                var addHour2 = JSON.stringify(Time.hour);
+                var addMinute2 = JSON.stringify(Time.minute);
+                if (addHour2.length < 2) {
+                    addHour2 = '0' + addHour2;
+                }
+                if (addMinute2.length < 2) {
+                    addMinute2 = '0' + addMinute2;
+                }
+                $("#addHour2").val(addHour2);
+                $("#addMinute2").val(addMinute2);
+            }
+        };
+    });
+
+    function StudentsLeaveController($scope, $http) {
+        var myDate = new Date();
+        var Month = myDate.getMonth() + 1;
+        var Day =  myDate.getDate();
+        var Year = myDate.getFullYear();
+        if(Month < 10){
+            Month = "0"+ Month;
+        }
+        if(Day < 10){
+            Day = "0"+ Day;
+        }
+        $("#addYear1").val(Year);
+        $("#addYear2").val(Year);
+        $("#addMonth1").val(Month);
+        $("#addMonth2").val(Month);
+        $("#addDay1").val(Day);
+        $("#addDay2").val(Day);
+        var isSuccess = 0;
+        var Token = appcan.getLocVal("Token");
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var Type = apiConfig.GetLeaveType.Type;
+        var Url = apiConfig.GetLeaveType.Url;
+        var parameters = { "token": Token };
+        var url = GetMappingUrl(Url, parameters);
+        $.ajax({
+            url: url,
+            type: Type,
+            data: parameters,
+            dataType: "json",
+            success: function (data) {
+                isSuccess = 1;
+                $scope.LeaveType = data;
+                $scope.$apply();
+                appcan.locStorage.setVal("LeaveType", data);
+            },
+            complete: function () {
+                if (isSuccess == 0) {
+                    var LatestTopOneLeaveTypeData = appcan.locStorage.getVal("LeaveType");
+                    var LatestTopOneLeaveType = JSON.parse(LatestTopOneLeaveTypeData);
+                    $scope.LeaveType = LatestTopOneLeaveType;
+                    $scope.$apply();
+                }
+            }
+        });
+
+        $("#submit").on("click", function () {
+            appcan.window.openToast("提交中...");
+            var date=new Date();
+            var currentYear=date.getFullYear();  //获取年
+            isSuccess = 0;
+            var Token = appcan.getLocVal("Token");
+            var BeginTime = $("#addYear1").val() + "/" + $("#addMonth1").val() + "/" + $("#addDay1").val() +" "+ $("#addHour1").val() + ":" + $("#addMinute1").val();
+            var EndTime = $("#addYear2").val() + "/" +$("#addMonth2").val() + "/" + $("#addDay2").val() +" "+ $("#addHour2").val() + ":" + $("#addMinute2").val();
+            var Title = $(".Title").val();
+            var Content =  $(".Content").val();
+            var userType = appcan.getLocVal("UserType");
+            var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+            var Type = apiConfig.PutSchedulingProgram.Type;
+            var Url = apiConfig.PutSchedulingProgram.Url;
+            var parameters ={"token":Token,"Title":Title, "Content": Content,"BeginTime": BeginTime, "EndTime": EndTime};
+             var url = Url + "?token="+Token+"&Title="+Title+"&Content="+Content+"&BeginTime="+BeginTime+"&EndTime="+EndTime;
+            if (Title == "") {
+                alert("请输入事务主题");
+            }
+            else if(Content == ""){
+                alert("请输入具体事务描述！")
+            }
+            else if (BeginTime >= EndTime){
+                alert("无效时间，请检查！");
+            }
+            else {
+                $.ajax({
+                    url: url,
+                    type: Type,
+                    dataType: "json",
+                    success: function (data) {
+                        isSuccess = 1;
+                        appcan.window.alert({
+                            title: '提示',
+                            content: '数据提交成功！',
+                            buttons: '继续'
+                        });
+                        if (isSuccess == 1) {
+                            appcan.window.evaluateScript({
+                                name: "SchedulingProgram",
+                                scriptContent: "Refurbish()"
+                            });
+                            appcan.window.evaluateScript({
+                                name: "AddSchedulingProgram",
+                                scriptContent: "Close()"
+                            });
+                        }
+                    },
+                    complete: function (xhr, type, error) {
+                        if (isSuccess == 0) {
+                            appcan.ready(function () {
+                                appcan.window.openToast({
+                                    msg: '数据提交失败',
+                                    duration: '2000',
+                                    position: '5',
+                                    type: '0'
+                                });
+                            });
+                        }
+                    }
+                });
+            }
+        })
+    }
+
+    appcan.button(".btn", "ani-act", function () {
+        switch (this.id) {
+            case "btn1":
+                uexControl.openTimePicker($('#addHour1').val(), $('#addMinute1').val());
+                btnID = 'btn1';
+                break;
+            case "btn2":
+                uexControl.openTimePicker($('#addHour2').val(), $('#addMinute2').val());
+                btnID = 'btn2';
+                break;
+            case "btn3":
+                    uexControl.openDatePicker($('#addYear').val(),$('#addMonth1').val(), $('#addDay1').val());
+                btnID = 'btn3';
+                break;
+            case "btn4":
+                uexControl.openDatePicker($('#addYear').val(),$('#addMonth2').val(), $('#addDay2').val());
+                btnID = 'btn4';
+                break;
+        }
+    });
+
+    appcan.switchBtn(".switch", function(obj, value) {
+        if(value == true)
+        {
+            $("#addHour2").val("15");
+            $("#addMinute2").val("30");
+        }
+        else
+        {
+            $("#addHour2").val("09");
+            $("#addMinute2").val("30");
+        }
+    })
+
+</script>
+</html>

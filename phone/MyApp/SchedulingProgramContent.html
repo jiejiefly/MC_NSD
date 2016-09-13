@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html ng-app ng-controller="SchedulingProgramController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>日程安排浮动窗口</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/ui-box.css">
+    <link rel="stylesheet" href="../css/ui-base.css">
+    <link rel="stylesheet" href="../css/ui-color.css">
+    <link rel="stylesheet" href="../css/appcan.icon.css">
+    <link rel="stylesheet" href="../css/appcan.control.css">
+    <link rel="stylesheet" href="SchedulingProgramContent/css/main.css">
+    <link rel="stylesheet" href="../css/ui-common.css">
+    <link rel="stylesheet" href="../css/animate.css">
+</head>
+<body class="um-vp bc-bg">
+<div id="divLoading" class="ub-f1">
+    <div class="loading">
+        <span class="fa fa-spinner fa-pulse"></span>&nbsp;正在加载中，请稍后...
+    </div>
+</div>
+<div  style="display: none;" id="divContent" >
+<div  class="ub ub-ver  ">
+    <div class="ub c-wh " >
+        <div class=" ub ub-f1  uinn " data-index="0">
+            <div class="ub-f1 ub ub-pj ub-ac">
+                <div class="ulev tx-c LastMonth">上一月</div>
+                <div class="ulev tx-c NextMonth">下一月</div>
+            </div>
+        </div>
+        <div class=" ub ub-f1 uinn" data-index="0">
+            <div class="ub-f1 ub  ub-ac ">
+                <div class="ulev tx-l YearMonth"></div>
+            </div>
+        </div>
+        <div class=" ub ub-f1  uinn" data-index="3">
+            <div class="ub-f1 ub  ub-ac ">
+                <div class="ulev tx-c Today">返回今天</div>
+            </div>
+        </div>
+    </div>
+    <div class="ub" ng-if="NoData!=1"  ng-cloak>
+        <div class="ub ub-f3 boxPrt-h">
+            <div class="boxCld1-h">日</div>
+        </div>
+        <div class="ub ub-f3 boxPrt-h ">
+            <div class="boxCld1-h">一</div>
+        </div>
+        <div class="ub ub-f3 boxPrt-h">
+            <div class="boxCld1-h">二</div>
+        </div>
+        <div class="ub ub-f3 boxPrt-h">
+            <div class="boxCld1-h">三</div>
+        </div>
+        <div class="ub ub-f3 boxPrt-h">
+            <div class="boxCld1-h">四</div>
+        </div>
+        <div class="ub ub-f3 boxPrt-h">
+            <div class="boxCld1-h">五</div>
+        </div>
+        <div class="ub ub-f3 boxPrt-h">
+            <div class="boxCld1-h">六</div>
+        </div>
+    </div>
+
+    <div id="Calender"></div>
+
+    <div class="ub c-wh " >
+        <div class=" ub ub-f1 uinn" data-index="0">
+            <div class="ub-f1 ub  ub-ac ">
+                <div class="ulev tx-l FirstDayOfAWeek"></div>
+                <div class="ulev tx-l ">-</div>
+                <div class="ulev tx-l LastDayOfAWeek"></div>
+                <div class="ulev tx-l ">的日程安排</div>
+            </div>
+        </div>
+        <div class=" ub ub-f1 LastWeek uinn " data-index="0">
+            <div class="ub-f1 ub  ub-ac">
+                <div class="ulev tx-c ">上一周</div>
+            </div>
+        </div>
+        <div class=" ub ub-f1 NextWeek uinn" data-index="3">
+            <div class="ub-f1 ub  ub-ac">
+                <div class="ulev tx-c ">下一周</div>
+            </div>
+        </div>
+    </div>
+    <div class="sc-text "  id="NoData" style=" display: none; margin-top: 2em;  text-align: center;">本周无数据</div>
+    <div class="ubt" id="BlueLine"  style="border-color: #009DD9 ;"></div>
+    <div class=" bc-border ub-ac c-wh "   id="ShowAWeekData"  ></div>
+    <div class="ubt" id="OrageLine"  style="border-color: #FC7800 ;"></div>
+    <div class=" bc-border ub-ac c-wh " id="ShowAWeekOutData"></div>
+</div>
+</div>
+<script src="../js/appcan.js"></script>
+<script src="../js/appcan.control.js"></script>
+<script src="../js/angular.min.js"></script>
+<script src="../js/Common.js"></script>
+</body>
+<script>
+    var date=new Date();
+    var currentYear=date.getFullYear();  //获取年
+    var currentMonth=date.getMonth();    //获取月
+    var currentDay=date.getDate();       //获取日
+    var LastmonthDays;                   //上个月天数
+    var ThismonthDays;                   //这个月天数
+    var NextmonthDays;                   //下个月天数
+    var clickLastAndNextWeekDay;         //点击上下星期传的参数  day
+    var FirstDayOfAWeek;                 //补零以后的每周开始时间，结束时间
+    var LastDayOfAWeek;                  //补零以后的每周开始时间，结束时间
+    var LastMonthID;                     //上个月每天的id  如2015/08/08 的id为 20150808
+    var ThisMonthID;                     //本月每天的id
+    var NextMonthID;                     //下个月每天的id
+
+    showCalendar(currentYear,currentMonth);// 显示日历
+    GetFirstDayAndLastDayOfAWeekByOneday(currentYear,currentMonth,currentDay);
+
+
+    var WindowWidth = $(window).width(); //获取屏幕的宽度，并平分为7份
+    var DayWidth = WindowWidth / 7 ;
+    $(".DayWidth").css("width", DayWidth);
+
+    appcan.ready(function () {
+        $("#divLoading").hide();
+        $("#divContent").show();
+        $("#NoData").hide();
+    });
+
+    function SchedulingProgramController($scope) {
+        // 上个月
+        GetAjaxData($scope); 
+        $(".LastMonth").on("click", function () {
+            currentMonth -= 1;
+            if( currentMonth < 0 ){
+                currentYear -= 1;
+                currentMonth = 11;
+            }
+            GetAjaxData($scope);
+            showCalendar(currentYear,currentMonth);
+            GetFirstDayAndLastDayOfAWeekByOneday(currentYear,currentMonth,1);
+            ClickEvent();
+        });
+        // 下个月
+        $(".NextMonth").on("click", function () {
+            currentMonth += 1;
+            if( currentMonth > 11 ){
+                currentYear += 1;
+                currentMonth = 0;
+            }
+            GetAjaxData($scope);
+            showCalendar(currentYear,currentMonth);
+            GetFirstDayAndLastDayOfAWeekByOneday(currentYear,currentMonth,1);
+            ClickEvent();
+        });
+        //返回今天
+        $(".Today").on("click", function () {
+            var Todaydate=new Date();
+            var year=Todaydate.getFullYear();  //获取年
+            var month=Todaydate.getMonth();    //获取月
+            var day=Todaydate.getDate();       //获取日
+            GetAjaxData($scope);
+            showCalendar(year,month);
+            GetFirstDayAndLastDayOfAWeekByOneday(year,month,day);
+            ClickEvent();
+        });
+        //上一周
+        $(".LastWeek").on("click", function () {
+            var firstOfAMonth =(currentYear + "/" +(currentMonth+1) + "/" + "1").replace(/\/(?!\d{2})/g, "/0");
+            clickLastAndNextWeekDay -= 7;
+            showCalendar(currentYear,currentMonth);
+            if(  FirstDayOfAWeek<=firstOfAMonth && firstOfAMonth<=LastDayOfAWeek ){
+                alert("已是本月第一周");
+            }
+            else{
+                GetAjaxData($scope);
+                GetFirstDayAndLastDayOfAWeekByOneday(currentYear,currentMonth,clickLastAndNextWeekDay);
+            }
+            ClickEvent();
+        });
+        //下一周
+        $(".NextWeek").on("click", function () {
+            showCalendar(currentYear,currentMonth);
+            var lastOfAMonth =(currentYear + "/" +(currentMonth+1) + "/" + ThismonthDays).replace(/\/(?!\d{2})/g, "/0") ;
+            clickLastAndNextWeekDay += 7;
+            if( FirstDayOfAWeek<=lastOfAMonth && lastOfAMonth<=LastDayOfAWeek ){
+                clickLastAndNextWeekDay +=7;
+                alert("已是本月最后一周");
+            }
+            else{
+                GetAjaxData($scope);
+                GetFirstDayAndLastDayOfAWeekByOneday(currentYear,currentMonth,clickLastAndNextWeekDay);
+            }
+            ClickEvent();
+        });
+        //点击某一天，即日视图
+      
+        ClickEvent();
+    }
+    function ClickEvent(){   
+        $('.DayView').on("click", function(){
+            var dayViewID = $(this).attr("id");
+            var dayYear = dayViewID[0] + dayViewID[1] + dayViewID[2] + dayViewID[3];
+            var dayMonth = dayViewID[4] + dayViewID[5] - 1;
+            var dayDay= dayViewID[6] + dayViewID[7];
+            GetFirstDayAndLastDayOfAWeekByOneday(dayYear,dayMonth,dayDay);
+            var calenderId = "#sch" + $(this).attr("id");
+            var a ="sch" + $(this).attr("id");
+            $("#"+a).addClass("TodayColor");
+            window.location.hash = calenderId;    
+        });
+    }
+    function showCalendar(year,month){
+      
+        var YearMonth = year + "/" + (month+1) ; //标题的年份
+        $(".YearMonth").html(YearMonth);//显示标题的年份
+        var MyDate = new Date(year,month ,1); //某年某月1号
+        var day=MyDate.getDay(); //获取某年某月1号是周几
+
+        if(month-1<0){           //月的索引大于11时，年+1，月=0
+             LastmonthDays=getMonthDays(year-1,11);
+             ThismonthDays=getMonthDays(year,month);
+             NextmonthDays=getMonthDays(year,month + 1);
+        }else if(month+1>11){    //月的索引小于0时，年-1，月=11
+             LastmonthDays=getMonthDays(year,month - 1);
+             ThismonthDays=getMonthDays(year,month);
+             NextmonthDays=getMonthDays(year+1,0);
+        }
+        else{
+             LastmonthDays=getMonthDays(year,month - 1);
+             ThismonthDays=getMonthDays(year,month);
+             NextmonthDays=getMonthDays(year,month + 1);
+        }
+        var str = "<table cellspacing= 0 class='CalendarTable c-wh' >"; //定义一个基础样式
+
+        var ThisMonthDayslen = ThismonthDays + day;  // 当月索引
+        var LastMonthDayslen = day;  // 上月索引，其实直接用day(周几)及可表示上月索引
+        var CalenderIndex = ThisMonthDayslen;
+        if(CalenderIndex>35){    //日历视图的3中基本情况， 4行 5行 6行
+            CalenderIndex = 42;
+        }
+        else if(CalenderIndex>28 && CalenderIndex<36){
+            CalenderIndex = 35;
+        }
+        else{
+            CalenderIndex = 28;
+        }
+       for(var i= 0; i<CalenderIndex; i++){
+           if(i%7==0){
+               str += "<tr><td id='' >" + i + "</td>";
+           }
+           else if(i%7==6){
+               str += "<td id=''>" + i + "</td></tr>";
+           }
+           else {
+               str += "<td id=''>" + i + "</td>";
+           }
+       }
+
+        $("#Calender").html(str);
+        var tr=$("tr");
+        var td=$("td");
+        for(var k=0;k<td.length;k++){
+            td[k].innerHTML="";
+            td[k].className="DayWidth tx-c DiyOutline ";
+        }
+        $(".DayWidth").css("width", DayWidth);
+        
+        //显示上个月最后几天
+        for(var LastMonthi= 0 ;LastMonthi<LastMonthDayslen;LastMonthi++){           
+            var LastMonth_td=td[LastMonthi];
+            var LastMonthj= LastMonthi+LastmonthDays-day+1;
+            var lastMonthID = (year +"/"+ month +"/"+LastMonthj).replace(/\/(?!\d{2})/g, "/0");
+            LastMonthID = lastMonthID.replace(/\//g, "");
+            LastMonth_td.innerHTML=LastMonthj;
+            LastMonth_td.className="DayView DayWidth tx-c DiyOutline sc-text";
+            
+            LastMonth_td.id= LastMonthID;
+            DealData(); // 有事件加背景颜色
+         }
+
+        //显示本月所有天
+        for(var ThisMonthi=day;ThisMonthi<ThisMonthDayslen;ThisMonthi++) {
+            var ThisMonth_td = td[ThisMonthi];
+            var ThisMonthj = ThisMonthi - day + 1;
+            var thisMonthID = (year + "/" + (month + 1) + "/" + ThisMonthj).replace(/\/(?!\d{2})/g, "/0");
+            ThisMonthID = thisMonthID.replace(/\//g, "");
+            ThisMonth_td.innerHTML = ThisMonthj;
+            ThisMonth_td.className = "DayView date DayWidth tx-c DiyOutline";
+            ThisMonth_td.id = ThisMonthID;
+            if (date.getFullYear() == year && date.getMonth() == month && date.getDate() == ThisMonthj) {
+                ThisMonth_td.className = "DayView today TodayColor DayWidth tx-c DiyOutline ";
+                ThisMonth_td.innerHTML = "今";
+                ThisMonth_td.id = ThisMonthID;
+            }
+            DealData();  // 有事件加背景颜色
+        }
+        //显示下个月的前几天
+        var NextMonthj= 1;
+        for(var NextMonthi=ThisMonthDayslen;NextMonthi<td.length;NextMonthi++){
+            var NextMonth_td=td[NextMonthi];
+            var nextMonthID = (year +"/"+ (month+2) +"/"+NextMonthj).replace(/\/(?!\d{2})/g, "/0");
+            NextMonthID = nextMonthID.replace(/\//g, "");
+            NextMonth_td.innerHTML=NextMonthj;
+            NextMonth_td.className="DayView DayWidth tx-c DiyOutline sc-text";
+            NextMonth_td.id= NextMonthID;
+            NextMonthj++;
+            DealData(); // 有事件加背景颜色
+        }    
+    }
+    function getMonthDays(year,month){
+        var monthAry=[31,28,31,30,31,30,31,31,30,31,30,31];
+        if(year%400==0){
+            monthAry[1]=29;
+        }else{
+            if(year%4==0&&year%100!=0){
+                monthAry[1]=29;
+            }
+        }
+        return monthAry[month];
+    }
+
+    function GetFirstDayAndLastDayOfAWeekByOneday(year,month,day){
+        $("#ShowAWeekData").html("");
+        $("#ShowAWeekOutData").html("");
+        var mydate = new Date(year,month,day); //某年某月某号
+        var weekDay=mydate.getDay(); //获取某年某月某日是周几
+        var firstDay = day-weekDay ;
+        var lastDay = firstDay + 6;
+        var lastmonthDays=getMonthDays(year,month-1);
+        ThismonthDays=getMonthDays(year,month);
+        if(month<1){
+            var  acrossYear = 12;
+        }
+        if(firstDay<1){
+            var lastMonthFirstDay = lastmonthDays + firstDay; //上个月在这一周的第一天 如
+            if(acrossYear >11 ){  //点击上一个月 出现跨年的情况处理。
+                 var firstDayOfAWeek = 12 +"/" + (lastDay + 25);
+                 var lastDayOfAWeek = 1 + "/" + lastDay;
+            }
+            else{
+                 var firstDayOfAWeek = (month)+ "/" + lastMonthFirstDay;
+                 var lastDayOfAWeek = (month+1) + "/" + lastDay;
+            }
+        }
+        else if(lastDay>lastmonthDays){
+          lastDay = 6 - (ThismonthDays - firstDay);
+            var firstDayOfAWeek = (month+1)+ "/" + firstDay;
+            var lastDayOfAWeek = (month+2) + "/" + lastDay;
+        }
+        else{
+             var firstDayOfAWeek = (month+1)+ "/" + firstDay;
+             var lastDayOfAWeek = (month+1) + "/" + lastDay;
+        }
+        clickLastAndNextWeekDay=firstDay;
+        $(".FirstDayOfAWeek").html(firstDayOfAWeek);
+        $(".LastDayOfAWeek").html(lastDayOfAWeek);
+
+        FirstDayOfAWeek =  (currentYear+ "/" + firstDayOfAWeek).replace(/\/(?!\d{2})/g, "/0");
+        LastDayOfAWeek = (currentYear + "/" + lastDayOfAWeek).replace(/\/(?!\d{2})/g, "/0");
+        ShowThisWeekAjaxData();
+    }
+
+    function DealData(){
+    
+        var ajaxData = JSON.parse(appcan.locStorage.getVal("SchedulingProgramData"));
+        for(var i=0; i<ajaxData.length; i++){
+            var DateOfAjaxData = ajaxData[i].BeginTime.substring(0,10).replace(/\//g, "");
+            if(DateOfAjaxData == LastMonthID ){
+                $("#"+ DateOfAjaxData).css("background-color", "#FFDD55");
+            }
+            if(DateOfAjaxData == ThisMonthID ){
+                $("#"+ DateOfAjaxData).css("background-color", "#FFDD55");
+            }
+            if(DateOfAjaxData == NextMonthID){
+                $("#"+ DateOfAjaxData).css("background-color", "#FFDD55");
+            }
+            
+        }
+    }
+
+    function ShowThisWeekAjaxData(){
+        var GetAjaxData= JSON.parse(appcan.locStorage.getVal("SchedulingProgramData"));
+        var date=new Date();
+        var currentYear=date.getFullYear();  //获取年
+        var currentMonth=date.getMonth();    //获取月
+        var currentDay=date.getDate();       //获取日
+        var cuurentDate = (currentYear +"/"+ (currentMonth+1)+"/"+currentDay).replace(/\/(?!\d{2})/g, "/0");
+        for(var i=0; i<GetAjaxData.length; i++){
+            var getBeginTime = GetAjaxData[i].BeginTime.substring(0,10);  //2015/08/08
+            var getEndTime = GetAjaxData[i].EndTime.substring(0,10);
+            var getBeginMonthTime = GetAjaxData[i].BeginTime.substring(5,16); //08/08 09:00
+            var getEndMonthTime =GetAjaxData[i].EndTime.substring(5,16);
+            var title = GetAjaxData[i].Title;
+            var content = GetAjaxData[i].Content;
+            var Place = GetAjaxData[i].Place;
+            var Participant = GetAjaxData[i].Participant;
+            var beginTimeWeek = GetWeekdayByDate(getBeginTime);
+            var endTimeWeek = GetWeekdayByDate(getEndTime);
+            var schId = "sch" + getBeginTime.replace(/\//g, "");
+            if(Participant==null){
+                Participant="无其他人员参与";
+            }
+            if(Place==null){
+                Place="";
+            }
+            if(getBeginTime>=FirstDayOfAWeek && getBeginTime<=LastDayOfAWeek){
+                if(getBeginTime>=cuurentDate){
+                    var temp = '<div class=" bc-border ub-ac lis c-wh ubb " id='+schId+'>';
+                    temp += '<div class="ub  ub-pj"><div class="ub ut-m umar-t  MaxW  ut-s" >'+title+'</div>';
+                    temp +='<div class="ub ut-m umar-t ">'+Place+'</div></div>';
+                    temp += '<div class="ub  ub-pj"><div class="ub ub-ver ut-m umar-t tx-r diyFont sc-text">起:' +getBeginMonthTime+' ' +beginTimeWeek+'</div>';
+                    temp += '<div class="ub ub-ver ut-m umar-t diyFont sc-text">止:'+getEndMonthTime+ ' ' +endTimeWeek+'</div></div>';
+                    temp += '<div class="ub ub-ver ut-m sc-text umar-t txtH-v">'+Participant+'</div>';
+                    temp += '<div class="ub ub-ver ut-m sc-text umar-t">'+content+'</div></div>';
+                    $("#ShowAWeekData").append(temp);
+                    $("#ShowAWeekOutData").hide();
+                    $("#NoData").hide();
+                    $("#BlueLine").show();
+                }
+                else if(getEndTime<cuurentDate){
+                    var temp1 = '<div class=" bc-border ub-ac lis c-wh ubb " id='+schId+'>';
+                    temp1 += '<div class="ub  ub-pj"><div class="ub ut-m umar-t  ut-s MaxW ut-s">'+title+'</div>';
+                    temp1 +='<div class="ub ut-m umar-t  tx-r ">'+Place+'</div></div>';
+                    temp1 += '<div class="ub  ub-pj"><div class="ub ub-ver ut-m umar-t tx-r diyFont sc-text">起:' +getBeginMonthTime+' ' +beginTimeWeek+'</div>';
+                    temp1 += '<div class="ub ub-ver ut-m umar-t diyFont sc-text">止:'+getEndMonthTime+ ' ' +endTimeWeek+'</div></div>';
+                    temp1 += '<div class="ub ub-ver ut-m sc-text umar-t txtH-v">'+Participant+'</div>';
+                    temp1 += '<div class="ub ub-ver ut-m sc-text umar-t">'+content+'</div></div>';
+                    $("#ShowAWeekOutData").show();
+                    $("#NoData").hide();
+                    $("#ShowAWeekOutData").append(temp1);
+                    $("#OrageLine").show();
+                }
+            }
+        }
+        if($("#ShowAWeekData").html()=="" && $("#ShowAWeekOutData").html()==""){
+            $("#NoData").show();
+        }
+        if($("#ShowAWeekData").html()==""){
+            $("#BlueLine").hide();
+        }
+        if($("#ShowAWeekOutData").html()==""){
+            $("#OrageLine").hide();
+        }
+    }
+
+    function GetWeekdayByDate(time){
+        var dayYear = time[0] + time[1] + time[2] + time[3];
+        var dayMonth = time[5] + time[6] - 1;
+        var dayDay= time[8] + time[9];
+        var MyDate = new Date(dayYear,dayMonth ,dayDay); //某年某月某号
+        var week = "周" + "日一二三四五六".split("")[MyDate.getDay()];
+        return week;
+    }
+
+    function GetAjaxData($scope){
+        var isSuccess = 0;
+        var Token = appcan.getLocVal("Token");
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var Type = apiConfig.GetSchedulingProgram.Type;
+        var Url = apiConfig.GetSchedulingProgram.Url; 
+        var parameters = { "token": Token };
+        var url = GetMappingUrl(Url, parameters);
+        $.ajax({
+            url: url,
+            type: Type,
+            data: parameters,
+            dataType: "json",
+            success: function (data) {
+               
+                isSuccess = 1;
+                $scope.SchedulingProgramData = data;
+                $scope.$apply();
+                appcan.locStorage.setVal("SchedulingProgramData", data);           
+                if (data == "[]") {
+                    $scope.NoData = 1;
+                }
+            },
+            complete: function () {
+                if (isSuccess == 0) {
+                    var LatestTopOneSchedulingProgramData = appcan.locStorage.getVal("SchedulingProgramData");
+                    var LatestTopOneSchedulingProgram = JSON.parse(LatestTopOneSchedulingProgramData);
+                    $scope.SchedulingProgramData = LatestTopOneSchedulingProgram;
+                    $scope.$apply();
+                }
+            }
+        });
+    }
+</script>
+</html>

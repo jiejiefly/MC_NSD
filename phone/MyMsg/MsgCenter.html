@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+    <head>
+        <title>消息详情主页</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
+        <link rel="stylesheet" href="../css/ui-box.css">
+        <link rel="stylesheet" href="../css/ui-base.css">
+        <link rel="stylesheet" href="../css/ui-color.css">
+        <link rel="stylesheet" href="../css/appcan.icon.css">
+        <link rel="stylesheet" href="../css/appcan.control.css">
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+    <body class="um-vp " ontouchstart>
+        <div id="page_0" class="up ub ub-ver bc-bg" tabindex="0">
+            <!--header开始-->
+            <div id="header" class="uh bc-text-head ub bc-head">
+                <div class="nav-btn" id="nav-left">
+                    <div class="fa fa-angle-left fa-2x"></div>
+                </div>
+                <h1 class="ut ub-f1 ulev-3 ut-s tx-c" tabindex="0" id="AppName">消息中心</h1>
+                <div class="nav-btn nav-bt" id="nav-right">
+                    <div class="ub-img fa fa-mail-forward fa-diyx"></div>
+                </div>
+            </div>
+            <!--header结束--><!--content开始-->
+            <div id="content" class="ub-f1 tx-l">
+
+            </div>
+            <!--content结束-->
+
+        </div>
+        <script src="../js/appcan.js"></script>
+        <script src="../js/appcan.control.js"></script>
+        <script src="../JsonData/messageData.js"></script>
+    </body>
+    <script>
+        appcan.ready(function() {
+            var titHeight = $('#header').offset().height;
+            appcan.frame.open("content", "MsgCenterContent.html", 0, titHeight);
+            window.onorientationchange = window.onresize = function() {
+                appcan.frame.resize("content", 0, titHeight);
+            }
+        
+            var AppId = appcan.locStorage.val("AppId");
+            
+            switch ( AppId ){
+                case 'Kcb':
+                     url = '../MyApp/AppKCB.html';
+                     break; 
+                case '76014e09-c57c-4ec4-aff8-d7600a0885d0':
+                     url = '../MyApp/Office.html';
+                     break;  
+                case 'd923e0ae-dbae-47b7-bcd1-2398ef2ca3ad':
+                     url = '../MyApp/DailyPer.html';
+                     break;  
+                case 'Wkxt':
+                     url = '../MyApp/AppWKXT.html';
+                     break;  
+                case 'f923e0ae-dbae-47b7-bcd1-2398ef2ca3af':
+                     url = '../MyApp/Homework.html';
+                     break;  
+                case 'Ctj':
+                     url = '../MyApp/AppCTJ.html';
+                     break;  
+                case 'Xxq':
+                     url = '../MyApp/AppXXQ.html';
+                     break;  
+                case 'e923e0ae-dbae-47b7-bcd1-2398ef2ca3ae':
+                     url = '../MyApp/Attendance.html';
+                     break;  
+                case '7f6b4c18-e26f-4f01-a9e2-68796fd81023':
+                     url = '../MyApp/ScoreQuery.html';
+                     break;  
+                default:
+                     break;  
+            }
+            
+        });
+        
+        //点击右上方按钮进入相应应用
+        appcan.button(".nav-btn", "btn-act", function() {
+            if ( $(this).attr("id") == "nav-right" ){
+                appcan.window.open("content", url, 5)
+            }
+            setTimeout("appcan.window.close(-1);", 500);
+        })
+        
+        function XiuGaiAppName(AppName){
+            $("#AppName").html(AppName);
+        }
+        
+        function OpenNewPage(AppUrl){
+            url = AppUrl;
+        }
+        
+        
+
+    </script>
+</html>

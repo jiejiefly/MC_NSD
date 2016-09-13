@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>打电话发短息浮动页</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/ui-box.css">
+    <link rel="stylesheet" href="../css/ui-base.css">
+    <link rel="stylesheet" href="../css/ui-color.css">
+    <link rel="stylesheet" href="../css/appcan.icon.css">
+    <link rel="stylesheet" href="../css/appcan.control.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body class="um-vp ub" ontouchstart style="background:rgba(0,0,0,0.5);">
+    <div class="ub ub-ver ub-f1 ub-con">
+        <div class="ub-f1 ub-con ub-fh ub-fv" ontouchstart="appcan.touch('btn-act')" onclick="closepop()"></div>
+        <div id="content" class="c-wh uinn ub-ver">
+            <div class="uinn">
+                <div class="btn ub ub-ac bc-text-head ub-pc bc-btn uc-a1" id="btn1">
+                    电话
+                </div>
+            </div>
+            <div class="uinn">
+                <div class="btn ub ub-ac bc-text-head ub-pc sc-btn uc-a1" id="btn2">
+                    短信
+                </div>
+            </div>
+            <!--<div class=" uinn">
+                <div class="btn ub ub-ac bc-text-head ub-pc bc-btndiy uc-a1 " id="btn3">
+                    聊天
+                </div>
+            </div>-->
+            <div class=" uinn">
+                <div class="btn ub ub-ac bc-text-head ub-pc  uc-a1 uba b-gra t-gra" id="btn4">
+                    取 消
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/appcan.js"></script>
+    <script src="../js/appcan.control.js"></script>
+</body>
+<script>
+    appcan.ready(function () {
+        var ContactInformation = JSON.parse(appcan.locStorage.val("ContactInformation"));
+        var Mobile = ContactInformation.Mobile;
+        appcan.button(".btn", "ani-act", function () {
+            var btn_id = $(this).attr("id");
+            switch (btn_id) {
+                case 'btn1':
+                    if (Mobile == null || Mobile == '') {
+                        appcan.window.openToast("电话号码为空！", 2000);
+                    } else {
+                        uexCall.dial(Mobile);
+                    }
+                    break;
+                case "btn2":
+                    if (Mobile == null || Mobile == '') {
+                        appcan.window.openToast("电话号码为空！", 2000);
+                    } else {
+                        var content = "";
+                        uexSMS.open(Mobile, content);
+                    }
+                    break;
+                case "btn3":
+                    break;
+                default:
+                    appcan.window.evaluateScript({
+                        name: "SingleContact",
+                        scriptContent: "OpenSingleContactContent()"
+                    });
+                    appcan.frame.close("content");
+                    break;
+            }
+        })
+    })
+
+</script>
+</html>

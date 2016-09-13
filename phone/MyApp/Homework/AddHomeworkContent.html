@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html ng-app ng-controller="AddHomeworkController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>添加今天作业浮动窗口</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="../../css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../../css/ui-box.css">
+    <link rel="stylesheet" href="../../css/ui-base.css">
+    <link rel="stylesheet" href="../../css/ui-color.css">
+    <link rel="stylesheet" href="../../css/appcan.icon.css">
+    <link rel="stylesheet" href="../../css/appcan.control.css">
+    <link rel="stylesheet" href="AddHomeworkContent/css/main.css">
+</head>
+<body class="um-vp bc-bg">
+    <div class="uba bc-border c-wh uinn7">
+        <ul>
+            <li class="umar-b umar-t">
+                <div class="uba uinput ub ub-f1 ">
+                    <textarea class="Homework" placeholder="请输入今日作业" name="txt" clos="20" rows="5" warp="virtual"></textarea>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div id="listview1"ng-controller="HomeworkSubejectController" class="ubb bc-border c-wh umar-at1 uinn-a7">
+        <ul>
+            <li class=" ub bc-text ub-ac lis select" id="2" data-index="0">
+                <span class="lv_title ub-f1 marg-l ub ub-ver ut-m line1">
+                    学科
+                </span>
+                <div class="tx-r sc-text   ub umar-r lv_subTitle">
+                    请选择 <!--这里是配合下面，也不能删除，因为用户选择一项的时候，不会显示在这里，所以加了【请选择】-->
+                </div>
+                <select selectedindex="0" id="select">
+                    <option value="-1">请选择</option><!--这里要判断逻辑，如果是-1提示用户必选，另外这里不能删除，因为用户选择第一项的时候，不会回调-->
+                    <option ng-repeat="SD in SubjectData" value="{{SD.SubjectName}}">{{SD.SubjectName}}</option>
+                </select>
+                <div class="fa fa-angle-down ulev2 sc-text"></div>
+            </li>
+        </ul>
+    </div>
+    <div id="listview2" class="ubb bc-border c-wh umar-at1 uinn-a7">
+        <ul>
+            <li class=" ub bc-text ub-ac lis select" id="1" data-index="0">
+                <span class="lv_title ub-f1 marg-l ub ub-ver ut-m line1">
+                    班级
+                </span>
+                <div class="tx-r sc-text   ub umar-r lv_subTitle">
+                    请选择 <!--这里是配合下面，也不能删除，因为用户选择一项的时候，不会显示在这里，所以加了【请选择】-->
+                </div>
+                <select selectedindex="0" id="select1">
+                    <option value="-1">请选择</option><!--这里要判断逻辑，如果是-1提示用户必选，另外这里不能删除，因为用户选择第一项的时候，不会回调-->
+                    <option ng-repeat="CD in ClassData" value="{{CD.ClassId}}">{{CD.ClassName}}</option>
+                </select>
+                <div class="fa fa-angle-down ulev2 sc-text"></div>
+            </li>
+        </ul>
+    </div>
+    <br />
+    <div class="uin uinn">
+        <div class="btn ub ub-ac bc-text-head ub-pc bc-btn uc-a1" id="submit">提 交</div>
+    </div>
+    <script src="../../js/appcan.js"></script>
+    <script src="../../js/appcan.control.js"></script>
+    <script src="../../js/angular.min.js"></script>
+    <script src="../../js/Common.js"></script>
+</body>
+<script>
+    var SendData;
+    var ClassName;
+    var parameters;
+    appcan.ready(function () {
+        appcan.select(".select", function (ele, value) {
+        });
+    });
+    function HomeworkSubejectController($scope){
+        var isSuccess = 0;
+        var Token = appcan.getLocVal("Token");     
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));   
+        var Type = apiConfig.GetHomeworkSubject.Type;
+        var Url = apiConfig.GetHomeworkSubject.Url;
+        var parameters = { "token": Token };
+        var url = GetMappingUrl(Url, parameters);
+        $.ajax({
+            url: url,
+            type: Type,
+            data: parameters,
+            dataType: "json",
+            success: function (data) {
+                isSuccess = 1;
+                $scope.SubjectData = data;
+                $scope.$apply();
+                appcan.locStorage.setVal("SubjectData", data);
+            },
+            complete: function () {
+                if (isSuccess == 0) {
+                    var LatestTopOneSubjectData = appcan.locStorage.getVal("SubjectData");
+                    var LatestTopOneSubject = JSON.parse(LatestTopOneSubjectData);
+                    $scope.SubjectData = LatestTopOneSubject;
+                    $scope.$apply();
+                }
+            }
+        });
+    }
+    function AddHomeworkController($scope) {
+       var isSuccess = 0;
+        var Token = appcan.getLocVal("Token");
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var Type = apiConfig.GetClass.Type;
+        var Url = apiConfig.GetClass.Url;
+        var parameters = { "token": Token };
+        var url = GetMappingUrl(Url, parameters);
+        $.ajax({
+            url: url,
+            type: Type,
+            data: parameters,
+            dataType: "json",
+            success: function (data) {
+                isSuccess = 1;
+                $scope.ClassData = data;
+                $scope.$apply();
+                appcan.locStorage.setVal("ClassData", data);
+            },
+            complete: function () {
+                if (isSuccess == 0) {
+                    var LatestTopOneClassData = appcan.locStorage.getVal("ClassData");
+                    var LatestTopOneClass = JSON.parse(LatestTopOneClassData);
+                    $scope.ClassData = LatestTopOneClass;
+                    $scope.$apply();
+                }
+            }
+        });
+
+        //插入日常作业
+        appcan.button("#submit", "ani-act", function () {
+            var isSuccess = 0;
+            var ClassID = $("#select1").val();
+            var Subject = $("#select").val();
+            var Content = $(".Homework").val().replace(/\n/g,"<br/>");
+            var Data = JSON.parse(appcan.locStorage.getVal("ClassData"));
+            for (var i in Data) {
+                if (Data[i].ClassId == ClassID) {
+                    SendData = { "content": Content, "teacherId": Data[i].TeacherId, "teacherName": Data[i].TeacherName, "classId": Data[i].ClassId, "classname": Data[i].ClassName, "subjectName": Subject };
+                    ClassName = Data[i].ClassName;
+                    parameters = SendData;
+                }
+            }
+            var Url = apiConfig.PutHomework.Url;
+            var Type = apiConfig.PutHomework.Type;
+            var url = GetMappingUrl(Url, parameters);
+            if (Content == "" || ClassID == -1) {
+                alert("请输入内容或选择班级！");
+            }
+            else {
+                $.ajax({
+                    url: url,
+                    type: Type,
+                    async: false,
+                    data: parameters,
+                    dataType: "json",
+                    success: function (data) {
+                        isSuccess = 1;
+                        appcan.window.alert({
+                            title: '提示',
+                            content: '数据提交成功！',
+                            buttons: '继续'
+                        });
+                        if (isSuccess == 1) {
+                            appcan.window.evaluateScript({
+                                name: "Homework",
+                                scriptContent: "Refurbish()"
+                            });
+                            appcan.window.evaluateScript({
+                                name: "AddHomework",
+                                scriptContent: "Close()"
+                            });
+                        }
+                    },
+                    complete: function (xhr, type, error) {
+                        if (isSuccess == 0) {
+                            appcan.ready(function () {
+                                appcan.window.openToast({
+                                    msg: '加载最新数据失败',
+                                    duration: '2000',
+                                    position: '5',
+                                    type: '0'
+                                });
+                            });
+                        }
+                    }
+                });     
+            }
+        })
+    }
+</script>
+</html>

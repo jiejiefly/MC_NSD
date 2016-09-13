@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html ng-app ng-controller="KcbController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>课程表浮动窗口，学生、家长获取课程表</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/ui-box.css">
+    <link rel="stylesheet" href="../css/ui-base.css">
+    <link rel="stylesheet" href="../css/ui-color.css">
+    <link rel="stylesheet" href="../css/appcan.icon.css">
+    <link rel="stylesheet" href="../css/appcan.control.css">
+    <link rel="stylesheet" href="LessonScheduleContent/css/main.css">
+    <link rel="stylesheet" href="../css/ui-common.css">
+</head>
+<body class="um-vp bc-bg">
+    <div id="divLoading" class="ub-f1">
+        <div class="loading">
+            <span class="fa fa-spinner fa-pulse"></span>&nbsp;正在加载中，请稍后...
+        </div>
+    </div>
+    <div id="divContent" class="ub ub-ver">
+        <div class="ub" ng-if="NoData!=1" ng-cloak>
+            <div class="ub ub-f1 boxPrt-h">
+                <div class="boxCld-h"></div>
+            </div>
+            <div class="ub ub-f3 boxPrt-h">
+                <div class="boxCld-h">星期一</div>
+            </div>
+            <div class="ub ub-f3 boxPrt-h ">
+                <div class="boxCld-h">星期二</div>
+            </div>
+            <div class="ub ub-f3 boxPrt-h">
+                <div class="boxCld-h">星期三</div>
+            </div>
+            <div class="ub ub-f3 boxPrt-h">
+                <div class="boxCld-h">星期四</div>
+            </div>
+            <div class="ub ub-f3 boxPrt-h">
+                <div class="boxCld-h">星期五</div>
+            </div>
+        </div>
+        <div class="ub jCls" ng-repeat="data in KcbData" ng-if="NoData!=1" ng-cloak>
+            <div class="ub ub-f1 boxPrt">
+                <div class="boxCld0">{{data.No}}</div>
+            </div>
+            <div class="ub ub-f3 ub-ver boxPrt">
+                <div class="boxCld ut-s"><span ng-if="i=='Student'">{{data.Week[0].Course}}</span></div>
+                <div class="boxCld1 ut-s"><span ng-if="i=='Student'">{{data.Week[0].Teacher}}</span></div>
+                <div class="boxCld0 ut-s"><span ng-if="i=='Teacher'">{{data.Week[0].Class}}</span></div>
+            </div>
+            <div class="ub ub-f3 ub-ver boxPrt">
+                <div class="boxCld ut-s"><span ng-if="i=='Student'">{{data.Week[1].Course}}</span></div>
+                <div class="boxCld1 ut-s"><span ng-if="i=='Student'">{{data.Week[1].Teacher}}</span></div>
+                <div class="boxCld0 ut-s"><span ng-if="i=='Teacher'">{{data.Week[1].Class}}</span></div>
+            </div>
+            <div class="ub ub-f3 ub-ver boxPrt">
+                <div class="boxCld ut-s"><span ng-if="i=='Student'">{{data.Week[2].Course}}</span></div>
+                <div class="boxCld1 ut-s"><span ng-if="i=='Student'">{{data.Week[2].Teacher}}</span></div>
+                <div class="boxCld0 ut-s"><span ng-if="i=='Teacher'">{{data.Week[2].Class}}</span></div>
+            </div>
+            <div class="ub ub-f3 ub-ver boxPrt">
+                <div class="boxCld ut-s"><span ng-if="i=='Student'">{{data.Week[3].Course}}</span></div>
+                <div class="boxCld1 ut-s"><span ng-if="i=='Student'">{{data.Week[3].Teacher}}</span></div>
+                <div class="boxCld0 ut-s"><span ng-if="i=='Teacher'">{{data.Week[3].Class}}</span></div>
+            </div>
+            <div class="ub ub-f3 ub-ver boxPrt">
+                <div class="boxCld ut-s"><span ng-if="i=='Student'">{{data.Week[4].Course}}</span></div>
+                <div class="boxCld1 ut-s"><span ng-if="i=='Student'">{{data.Week[4].Teacher}}</span></div>
+                <div class="boxCld0 ut-s"><span ng-if="i=='Teacher'">{{data.Week[4].Class}}</span></div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/appcan.js"></script>
+    <script src="../js/appcan.control.js"></script>
+    <script src="../js/angular.min.js"></script>
+    <script src="../js/Common.js"></script>
+</body>
+<script>
+
+    appcan.ready(function () {
+        $("#divLoading").hide();
+        $("#divContent").show();
+        $(".jCls").each(function () {
+            var a = myDate.getDay();
+            $(this).find(".boxPrt").eq(a).css({ "border-bottom": "solid 1px red" });
+        });
+    });
+    function KcbController($scope, $http) {
+        var isSuccess = 0;
+        var userType = appcan.getLocVal("UserType");
+        var Token = appcan.getLocVal("Token");
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var Type = apiConfig.GetLessonSchedulestu.Type;
+        var Url = apiConfig.GetLessonSchedulestu.Url;
+        var parameters = { "token": Token };
+        var url = GetMappingUrl(Url, parameters);
+        if (userType == "Teacher") {
+            $scope.i = "Teacher";
+        }
+        else {
+            $scope.i = "Student";
+        }
+        $.ajax({
+            url: url,
+            type: Type,
+            data: parameters, 
+            dataType: "json",
+            success: function (data) {
+                isSuccess = 1;
+                $scope.KcbData = data;
+                $scope.$apply();
+                appcan.locStorage.val("LessonScheduleData", data);
+                if (appcan.locStorage.val("LessonScheduleData") == "[]") {
+                    $scope.NoData = 1;
+                    $scope.$apply();
+                }
+            },
+            complete: function () {
+                if (isSuccess == 0) {
+                    var LatestTopOneLessonScheduleData = appcan.locStorage.val("LessonScheduleData");
+                    var LatestTopOneLessonSchedule = JSON.parse(LatestTopOneLessonScheduleData);
+                    $scope.KcbData = LatestTopOneLessonSchedule;
+                    $scope.$apply();
+                }
+            }
+        });
+    }
+
+</script>
+</html>

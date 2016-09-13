@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html ng-app ng-controller="MySubjectDetailsController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+    <head>
+        <title>各科成绩浮动窗口</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="../../css/fonts/font-awesome.min.css">
+        <link rel="stylesheet" href="../../css/ui-box.css">
+        <link rel="stylesheet" href="../../css/ui-base.css">
+        <link rel="stylesheet" href="../../css/ui-color.css">
+        <link rel="stylesheet" href="../../css/appcan.icon.css">
+        <link rel="stylesheet" href="../../css/appcan.control.css">
+        <link rel="stylesheet" href="SubjectDetailsContent/css/main.css">
+    </head>
+    <body class="um-vp bc-bg" ontouchstart>
+        <div id="divLoading" class="ub-f1">
+            <div class="loading">
+                <span class="fa fa-spinner fa-pulse"></span>&nbsp;正在加载中，请稍后...
+            </div>
+        </div>
+        <div id="divContent" style="display:none; padding:0.0625em 0;">
+            <div class="bc-bg" ng-if="NoData==1">
+                <div class="NoDataImg_box ">
+                    <div class="NoDataImg_bg"></div>
+                </div>
+                <div class="NoData_box NoData_color">抱歉，暂时没有您要查看的数据！</div>
+            </div>
+            <div class = "c-wh umar-t">
+                <div ng-if="NoData!=1">
+                    <div ng-repeat="subject in MySubjectDetails" class="ubb ub bc-border ub-ver" >
+                         <div class='uinn2 c-gra ub b-bla umar-t ub-pj'>
+                             <div class='umh3'>{{subject.Subject}}</div>
+                             <div class='umh3'>{{subject.Score}}</div>
+                         </div>
+                    </div>
+                    <div class="uinn2 bc-border c-gra ub b-bla umar-t ub-pj">
+                        <div class='umh3'>总分</div>
+                        <div class='umh3'>{{sum}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="../../js/appcan.js"></script>
+        <script src="../../js/appcan.control.js"></script>
+        <script src="../../js/angular.min.js"></script>
+        <script src="../../js/Common.js"></script>
+    </body>
+    <script>
+        appcan.ready(function() {
+            $("#divLoading").hide();
+            $("#divContent").show();
+        });
+        //通过ajax向服务器请求数据
+        function MySubjectDetailsController($scope, $http) {
+            var token = appcan.locStorage.val("Token");
+            var examID = appcan.locStorage.val('ExamID');
+            var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+            var Url = apiConfig.GetSubjectDetail.Url;
+            var Type = apiConfig.Notice.Type;
+            var parameters = {'token' : token, 'ExamID' : examID};
+            var url = GetMappingUrl(Url, parameters);
+            var isSuccess = 0;
+            
+            $.ajax({
+                url : url,
+                type : Type,
+                async : false,
+                data: parameters,
+                dataType : "json",
+                success : function(data) {
+                    isSuccess = 1;
+                    $scope.sum = 0;
+                    var Data = data;
+                    if(Data.res_code == undefined){
+                        if(data == ""){
+                            $scope.NoData = 1;
+                        }else{
+                            $scope.MySubjectDetails = Data;
+                            appcan.locStorage.setVal("SubjectScoreData", data)
+                            //总分的计算
+                            for(var i in Data){
+                                $scope.sum = $scope.sum + $scope.MySubjectDetails[i].Score;
+                            }
+                            localStorage.SubjectSum = $scope.sum;
+                        }
+                    }
+                    else if(Data.res_code == "0") { }
+                    else if (Data.res_code == "-1") {
+                        //-1表示Token无效
+                        alert("请重新登录！");
+                        appcan.window.evaluateScript({
+                            name: "MainTab",
+                            scriptContent: "ExitSys()"
+                        });
+                    }
+                    else { 
+                        alert(Data.res_message); 
+                    }
+                },
+                complete: function (xhr, type, error) {
+                    if(isSuccess == 0){
+                       var SubjectScoreData = appcan.locStorage.val("SubjectScoreData");
+                       var SubjectSum = appcan.locStorage.val("SubjectSum");
+                       if(SubjectScoreData == undefined || SubjectScoreData == null){
+                           $scope.NoData = 1;
+                       }else{
+                           $scope.MySubjectDetails = JSON.parse(SubjectScoreData);
+                           $scope.sum = SubjectSum;
+                       }
+                    }
+                }
+            });
+        }
+
+    </script>
+</html>

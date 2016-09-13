@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html ng-app ng-controller="singleContactController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>联系人详细信息浮动页面</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/ui-box.css">
+    <link rel="stylesheet" href="../css/ui-base.css">
+    <link rel="stylesheet" href="../css/ui-color.css">
+    <link rel="stylesheet" href="../css/appcan.icon.css">
+    <link rel="stylesheet" href="../css/appcan.control.css">
+    <link rel="stylesheet" href="SingleContactContent/css/main.css">
+</head>
+<body class="um-vp bc-bg" ontouchstart>
+    <div class="ub ub-ver">
+        <div class="ub-img1 perBg uh-per1 ub-fh ub ub-ver">
+            <div class="uinn-a1 ub ub-f1">
+                <div class="uwh-per2 uc-a-per1 bc-bg ub ub-ac ub-pc uinn-a16">
+                    <div class="ub-fh ub-fv  ub-img uc-a-per2" style="background-image:url(SingleContactContent/css/myImg/NoContactIcon.png);" ng-if="SingleContactInformation.Icon==null||SingleContactInformation.Icon==''"></div>
+                    <div class="ub-fh ub-fv  ub-img uc-a-per2" style="background-image:url('{{SingleContactInformation.Icon}}');" ng-if="SingleContactInformation.Icon!=null&&SingleContactInformation.Icon!=''"></div>
+                </div>
+                <div class="ub-f1 umar-at1 umar-l-per1 ub ub-ver">
+                    <div class="ub ">
+                        <div class="umar-ar3 bc-text-head" id="contactName" ng-bind="SingleContactInformation.DName"></div>
+                    </div>
+                    <!-- <div class="ulev-4 t-wh2 umar-t ub-f1" id="contactUName" ng-bind="SingleContactInformation.UName"></div> -->
+                </div>
+            </div>
+        </div>
+        <div class="ub-f1 ub ub-ver">
+            <div id="listview1" class="ubt bc-border ubb c-wh umar-at1 uinn-a7">
+                <ul class="uinn-a7">
+                    <li class="ubb ub bc-border bc-text ub-ac lis">
+                        <div class="lv_title ub-f1 marg-l ub ub-ver ut-m line1 groupName">
+                            <span>电话:</span>
+                            <span id="phoneNum" ng-bind="SingleContactInformation.Mobile" ng-if="SingleContactInformation.Mobile!=null&&SingleContactInformation.Mobile!=''"></span>
+                            <span ng-if="SingleContactInformation.Mobile==null||SingleContactInformation.Mobile==''">-</span>
+                        </div>
+                    </li>
+                    <!-- <li class="ubb ub bc-border bc-text ub-ac lis">
+                        <div class="lv_title ub-f1 marg-l ub ub-ver ut-m line1 groupName">
+                            <span>邮箱:</span>
+                            <span id="email" ng-bind="SingleContactInformation.Email" ng-if="SingleContactInformation.Email!=''&&SingleContactInformation.Email!=null"></span>
+                            <span ng-if="SingleContactInformation.Email==''||SingleContactInformation.Email==null">-</span>
+                        </div>
+                    </li> -->
+                    <li class="ub bc-border bc-text ub-ac lis">
+                        <div class="lv_title ub-f1 marg-l ub ub-ver ut-m line1 groupName">
+                            <span>班级:</span>
+                            <span id="class" ng-bind="SingleContactInformation.Class[0]" ng-if="SingleContactInformation.Class[0]!=''&&SingleContactInformation.Class[0]!=null"></span>
+                            <span ng-if="SingleContactInformation.Class[0]==''||SingleContactInformation.Class[0]==null">-</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script src="../js/appcan.js"></script>
+    <script src="../js/appcan.control.js"></script>
+    <script src="../js/appcan.listview.js"></script>
+    <script src="../js/angular.min.js"></script>
+</body>
+<script>
+    function singleContactController($scope) {
+        var contactID = appcan.locStorage.val("contactID");
+        var allContacts = JSON.parse(appcan.locStorage.val("allContacts"));
+        for (var i = 0; i < allContacts.length; i++) {
+            if (allContacts[i].ID == contactID) {
+                ContactInformation = allContacts[i];
+                appcan.locStorage.val("ContactInformation", ContactInformation);
+            }
+        }
+        $scope.SingleContactInformation = ContactInformation;
+
+        appcan.ready(function () {
+        })
+    }
+</script>
+</html>

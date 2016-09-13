@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html ng-app ng-controller="DetailController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+    <head>
+        <title></title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="../../css/fonts/font-awesome.min.css">
+        <link rel="stylesheet" href="../../css/ui-box.css">
+        <link rel="stylesheet" href="../../css/ui-base.css">
+        <link rel="stylesheet" href="../../css/ui-color.css">
+        <link rel="stylesheet" href="../../css/appcan.icon.css">
+        <link rel="stylesheet" href="../../css/appcan.control.css">
+        <link rel="stylesheet" href="DetailContent/css/main.css">
+    </head>
+    <body class="um-vp bc-bg" ontouchstart>
+        <div id="divLoading" class="ub-f1">
+            <div class="loading">
+                <span class="fa fa-spinner fa-pulse"></span>&nbsp;正在加载中，请稍后...
+            </div>
+        </div>
+        <div id="divContent" style="display:none;">
+            <div class="ub ub-ver">
+                <div class="ub ub-ver umar-t ub-f1">
+                    <div class=" bc-border">
+                        <div class='uinn2 c-gra ub-pj ub b-bla ubb bc-border c-wh'>
+                             <div class="Name"></div>
+                             <div class='umh3 umw4 ub-f1' ng-bind="data.Title"></div>
+                             <div>
+                                <div class='umh3 umw4 tx-r sc-text ulev-1' ng-cloak>{{data.ApplyDate|limitTo:10}}</div>
+                                <div class = "bc-text-head uinn3 uc-a-list1 ulev-1 tx-c umw-s" id = "Status"></div>
+                             </div>
+                        </div> 
+                        <div class="ub bc-text ub-ac uinn-a11 c-wh">
+                            <div class="ub ub-f1 ulev-app1 uinn" id = "Content" ng-cloak>{{data.Content}}</div>
+                        </div>
+                        <div id = "approving" class = "ub-ver ubt c-wh bc-border">
+                            <!-- 车辆申请/维修申请时，选择驾驶员/维修人员 -->
+                            <div id = "selectbox">
+                                <div class="ub bc-text ub-ac uinn-a10">
+                                   <div id="content" class="uinn4 ub ub-f1">
+                                       <div class="select uba bc-border bc-text ub-f1 ub">
+                                            <div class="text">请选择</div>
+                                            <div class="icon"></div>
+                                            <select selectedindex="0">
+                                                <option value="-1">请选择</option>
+                                                <option ng-repeat="person in data.PersonList" value="{{person.Id}}" ng-cloak>{{person.Name}}</option>
+                                            </select>
+                                        </div>
+                                   </div>
+                                </div>
+                            </div>
+                            <!-- 审批意见的输入 -->
+                            <div class="ub bc-border bc-text ub-ac uinn-a9">
+                                <div class="uinn4 ub ub-f1">
+                                  <div class=" uinput ub ub-f1  bc-border uba ub-ac">
+                                     <input placeholder="审批意见" type="text" class="ub-f1" id="Comment">
+                                  </div>
+                                </div>
+                            </div>
+                            <!-- 同意/拒绝按钮 -->
+                            <div class="ub bc-border bc-text ub-ac uinn-a9 ub-pj" id="option">
+                                <div ApproveStatus="Y" class="option btn ub ub-ac bc-text-head ub-pc umar-l bc-btn uc-a1 ulev-1"  id="btn_Pass">&nbsp;&nbsp;通过&nbsp;&nbsp;</div>
+                                <div ApproveStatus="N" class="option btn ub ub-ac bc-text-head ub-pc umar-r btn_Refuse uc-a1 ulev-1"  id="btn_Refuse">&nbsp;&nbsp;拒绝&nbsp;&nbsp;</div>
+                            </div>
+                        </div>
+                        <div id = "approved" class = "umar-t c-wh ubb bc-border">
+                            <!-- <div class="ub bc-text ub-ac uinn-a9 tx-c ub-pc ubb bc-border">
+                                <div class="bc-text-head uinn3 uc-a-list1 ulev-1" id = "Status"></div>
+                            </div> -->
+                            <div ng-repeat="Cmt in data.ApproveList" ng-if="approvelist!='[]'" class="umar-l">
+                                <div class="ub bc-text ub-ac uinn-a11 ub-pj">
+                                    <div class="ub ub-ver ulev-app1">
+                                        <span ng-bind="Cmt.ApproveName"></span>
+                                    </div>
+                                    <div class="ub ub-ver ulev-app1">
+                                        <span ng-if="Cmt.Status=='Y'" class="txt-green">已通过</span>
+                                        <span ng-if="Cmt.Status=='N'" class="txt-orange">未通过</span>
+                                    </div>
+                                    <div class="ub ub-ver ulev-app1 sc-text">
+                                        <span ng-bind="Cmt.ApproveDate|limitTo:10"></span>
+                                    </div>
+                                </div>
+                                <div class="bc-border ub bc-text ub-ac uinn-a11 ulev-1 sc-text umar-l">
+                                    <div ng-bind="Cmt.Comment"></div>
+                                </div>
+                            </div>
+                            <div ng-if="approvelist=='[]'" class="bc-border ub bc-text ub-ac uinn-a9 tx-c uinn2 c-gra ub-pc">
+                                                                                                暂无审批记录
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script src="../../js/appcan.js"></script>
+    <script src="../../js/appcan.control.js"></script>
+    <script src="../../js/angular.min.js"></script>
+    <script src="../../js/Common.js"></script>
+    </body>
+    <script>
+        var selectVal;
+        var selectHide;
+        var ApplyId = appcan.locStorage.val("myId");
+        
+        var type = appcan.locStorage.val("Type");
+        if(type == 1){var EEData = JSON.parse(appcan.locStorage.val("NoApproveData"));}
+        else if(type == 2){var EEData = JSON.parse(appcan.locStorage.val("ApproveData"));}
+        else{var EEData = JSON.parse(appcan.locStorage.val("ApplyData"));}
+        function DetailController($scope, $http) {
+            var data = GetDetail();
+            ShowInfo (data);
+            Detail($scope,data);
+            $scope.approvelist = JSON.stringify(data.ApproveList);//用于判断是否有审批记录
+            $scope.$apply();
+            appcan.button(".option", "ani-act", function(){
+               if (selectHide != 1 && (selectVal == null || selectVal == -1)) {
+                       alert("请选择人员！");
+               }
+               else{
+                   var status = $(this).attr("ApproveStatus");
+               
+                    appcan.ready(function () {
+                        appcan.window.openToast(" 请稍候...");
+                    });
+                    
+                    var comment = $("#Comment")[0].value.trim();
+                    var applicationId = data.ApplicationID;
+                    var token = appcan.locStorage.val("Token");
+                    var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+                    var Url = apiConfig.PostApprove.Url;
+                    var Type = apiConfig.PostApprove.Type;
+                    var parameters = { 'Token': token, 'ApplicationId': applicationId, 'ApplyId': ApplyId, 'Comment': comment, 'Status': status, 'Id': selectVal};
+                    var url = GetMappingUrl(Url, parameters);
+                    var isSuccess = 0;
+                    $.ajax({
+                    url:url,
+                    type: Type,
+                    data: parameters,
+                    dataType: "json",
+                    success: function (data) {
+                        isSuccess = 1;
+                        var Data = data;
+                        if(Data.res_code == undefined){
+                            if(data == "[]"){
+                                $scope.NoData = 1;
+                            }else{
+                                $("#approving").hide();
+                                $("#approved").show();
+                                
+                                Detail($scope,Data);
+                        
+                                $scope.approvelist = JSON.stringify(Data.ApproveList);//用于判断是否有审批记录
+                                $scope.$apply();
+                                
+                                if(Data.ApproveCode == 1){    //同级审核只能审核一次
+                                    alert(Data.ApproveMsg);
+                                }
+                                
+                                appcan.window.evaluateScript({
+                                    name:"Office",
+                                    scriptContent:"Refresh()"
+                                }); 
+                                
+                                appcan.ready(function () {
+                                    appcan.window.openToast({
+                                        msg:'操作成功',
+                                        duration:2000,
+                                        position:5,
+                                        type:0
+                                    });
+                                });
+                            }
+                        }
+                        else if(Data.res_code == "0") { }
+                        else if (Data.res_code == "-1") {
+                            //-1表示Token无效
+                            alert("请重新登录！");
+                            
+                            appcan.window.evaluateScript({
+                                name: "MainTab",
+                                scriptContent: "ExitSys()"
+                            });
+                            
+                        }
+                        else { alert(Data.res_message); }
+                    },
+                 
+                    complete: function (xhr, type, error) {
+                        if (isSuccess == 0) {
+                            appcan.window.openToast({
+                                msg: '请求数据错误！',
+                                duration: 2000,
+                                position: 5,
+                                type: 0
+                            });
+                            
+                            appcan.window.closeToast();
+                        }
+                    }
+                  }); 
+               }   
+           });
+           
+           
+        }
+        
+        function Detail($scope,da) {
+            $scope.data = da;
+            $scope.$apply();
+            
+            var Status = da.Status;
+            var myStatus = "";
+            if(Status == "0"){
+                myStatus = "审批中";
+                $("#Status").addClass("c-blue");
+            }else if(Status == "Y"){
+                myStatus = "已通过"
+                $("#Status").removeClass("c-blue").addClass("c-green");                    
+            }else if(Status == "N"){
+                myStatus = "未通过"
+                $("#Status").removeClass("c-blue").addClass("c-orange");
+            }
+            $("#Status").html(myStatus);
+            
+            appcan.ready(function () {
+                appcan.window.closeToast();
+                
+                $("#divLoading").hide();
+                $("#divContent").show();
+                
+            });
+
+        }
+        
+        function GetDetail(){
+            
+            for(var i in EEData){
+                if(EEData[i].ID == ApplyId){
+                     return EEData[i];
+                }
+            }
+        }
+        
+        function ShowInfo(data) {
+            var type = appcan.locStorage.val("Type");
+            
+            if(type == 1){
+                var carMgt = "672E502E-F8DE-412C-A79C-1080BDCE2BFB";
+                var serviceMgt = "d42c1dda-fe5c-4fc8-b1e2-14f8017b4235";
+                if(data.ApplicationID == carMgt ){
+                    $(".text").html("请选择驾驶员");
+                }else if(data.ApplicationID == serviceMgt){
+                    $(".text").html("请选择维修人员");
+                }else{
+                    $("#selectbox").hide();
+                    selectHide = 1;
+                }
+                $(".Name").html('【' + data.Name + '】');
+            }else if(type == 2){                            //显示已审批的详细页面
+                $("#approving").hide();
+                $(".Name").html('【' + data.Name + '】');
+            }else{
+                $("#approving").hide();
+            }
+            
+        }
+        
+        appcan.select(".select",function(ele,value){
+            //console.log(value);
+            selectVal = value;
+        });
+        
+    </script>
+</html>

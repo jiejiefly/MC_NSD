@@ -1,0 +1,105 @@
+.t-gra-infor{
+    color:#626262;
+}
+
+.uinn-infor1{
+    padding:0.375em 0.83em;
+}
+.uw-infor{
+    width:4em;
+}
+.uwh-infor{
+    width:2em;
+    height:2em;
+}
+.umar-r-infor{
+    margin-right:0.1em;
+}
+
+.lin-hei1{
+    line-height:1.3em;
+}
+.c-gra-infor{
+    background-color:#c0c0c0;
+}
+.goods-infor1{
+    background-image:url('myImg/goods1.png');
+}
+.uinn-a6{
+    padding:1em 0.65em 0 0.65em;
+}
+.umar-ar4{
+    margin-right:0.3125em;
+}
+.uinn-a9{
+    padding:0.75em ;
+}
+.uinn-a10{
+    padding: 0.75em 0.75em 0em 0.75em;
+}
+.uinn-a11{
+    padding: 0.2em 0.75em 0.2em 1em;
+}
+.ulev-app1{
+    font-size:0.875em;
+    line-height: 180%;
+}
+.uinn-a1{
+    padding:0.625em;
+}
+.t-red1
+{
+    color:#de1010;
+}
+.c-wh
+{
+    background-color:#FFF;
+}
+.t-gre1{
+    color: rgb(47, 255, 89);
+}
+.c-orange{
+    background-color:#FF8C00;
+}
+.c-green{
+    background-color:#5e9e25;
+}
+.c-red-oa{
+    background-color:#cf3a3a;
+}
+.c-blue{
+    background-color:#00A1EA;
+}
+.uc-a-list1{
+    -webkit-border-radius: 0.2em;
+    border-radius: 0.2em
+}
+.detail-height{
+    min-height: 28em;
+}
+
+.breakword{
+    white-space:normal; 
+    word-break:break-all;
+    overflow:hidden;
+    Word-wrap:break-word;
+}
+.btn_Refuse{
+    background-color:#A9A9A9;
+}
+.m-l1{
+    margin-left: 5%;
+}
+.m-l2{
+    margin-left: 45%;
+}
+.date{
+    color: #A9A9A9;
+    font-size: 80%;
+}
+.txt-green{
+    color:#5e9e25;
+}
+.txt-orange{
+    color:#FF8C00
+}

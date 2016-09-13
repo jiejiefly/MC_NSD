@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+    <head>
+        <title></title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="css/fonts/font-awesome.min.css">
+        <link rel="stylesheet" href="css/ui-box.css">
+        <link rel="stylesheet" href="css/ui-base.css">
+        <link rel="stylesheet" href="css/ui-color.css">
+        <link rel="stylesheet" href="css/appcan.icon.css">
+        <link rel="stylesheet" href="css/appcan.control.css">
+        <link href="ErrorContent/css/ui-media.css"  type="text/css" rel="stylesheet"/>
+        <link href="ErrorContent/css/ui-style.css"  type="text/css" rel="stylesheet"/>
+    </head>
+    <body class="body_bg_color">
+        <div class="body_bg body_bg_color">
+            <div class="img_box ">
+                 <div id="bg_img" class="img_bg"></div>
+            </div>
+            <div class="eorr_box error_color">
+                  出错了！请轻触屏幕重试！
+            </div>
+            <div class="w_box">
+                <div class="diyDiv">
+                    网络信号弱、不稳定或安全软件禁止访问网络。您可在网络好时或关闭安全软件再重新加载该页面。
+                </div>
+            </div>
+        </div>
+
+        <script src="js/appcan.js"></script>
+        <script src="js/appcan.control.js"></script>
+    </body>
+    <script>
+        $("#bg_img").css('background-image', 'url("ErrorContent/css/myImg/uz.png")');
+        
+        var exitv = 0;
+        var plat;
+        window.uexOnload = function (type) {
+
+            if (!type) { ExitForAndroid(); }
+
+            appcan.ready(function () {
+                //初始化Index页面
+
+            });
+
+        }
+
+        function ExitForAndroid() {
+            //如果是Android平台，则监听返回按钮事件
+            plat = uexWidgetOne.getPlatform();
+            if (plat) {
+                uexWindow.onKeyPressed = function (keyCode) {
+                    if (keyCode == 0) {
+                        exitv++;
+                        //uexWidgetOne.exit();
+                        //uexWidgetOne.exit("0");
+                        if (exitv == 1) {
+                            appcan.window.openToast("再按一次，退出应用！", 3000);
+                            setTimeout("exitv = 0;", 3000);
+                        }
+                        else if (exitv == 2) {
+                            uexWidgetOne.exit("0");
+                        }
+
+                    }
+                }
+                uexWindow.setReportKey(0, 1);
+            }
+        }
+        
+        var i = 0;
+        $("body").on("click",function(){
+            appcan.device.getInfo(13, function (err, data, dataType, optId) {
+                var netStatus = JSON.parse(data);
+                if (netStatus.connectStatus == "-1")//-1：网络不可用，0：WIFI 1：3G，2：2G
+                {
+                    appcan.window.openToast("网络不给力，请检查网络设置并重试！", 4000);
+                    i++;
+                    if( i = 1 ){
+                        $("#bg_img").css('background-image', 'url("ErrorContent/css/myImg/axn.png")');
+                    }else if( i = 2 ){
+                        $("#bg_img").css('background-image', 'url("ErrorContent/css/myImg/ag8.png")');
+                    }else{
+                        $("#bg_img").css('background-image', 'url("ErrorContent/css/myImg/uz.png")');
+                        i = 0;
+                    }
+                }
+                else
+                {
+                    appcan.window.open({ name: 'MainTab', data: 'MainTab.html', aniId: 5 });
+                }
+            });
+            
+        })
+
+        function errorContent(){
+            
+            
+        }
+    </script>
+</html>

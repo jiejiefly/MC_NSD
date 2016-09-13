@@ -1,0 +1,81 @@
+.c-wh{
+    background-color: white;
+}
+.lis-icon-m {
+    width: 3em;
+    margin: 0em 0.4em 0em 0px;
+    min-height: 3em;
+}
+.bc-border:last-child{
+    border-bottom: #FFFFFF;
+}
+.mab {
+    margin-bottom:0.85em;
+}
+.tab_badge1 {
+    padding-top:0.1em;
+    min-width: 1.4em;
+    height: 1.3em;
+    -webkit-border-radius: 1.2em;
+    border-radius: 1.2em;
+    text-align: center;
+}
+.msgIconKcb {
+    background-image: url(myImg/Kcb.png);
+}
+.msgIconTzhgg {
+    background-image: url(myImg/Tzhgg.png);
+}
+.msgIconXyxw {
+    background-image: url(myImg/Xyxw.png);
+}
+.msgIconXzhbg {
+    background-image: url(myImg/Xzhbg.png);
+}
+.msgIconXxq {
+    background-image: url(myImg/Xxq.png);
+}
+.msgIconGzhh {
+    background-image: url(myImg/Gzhh.png);
+}
+.msgIconCtj {
+    background-image: url(myImg/Ctj.png);
+}
+.msgIconWkxt {
+    background-image: url(myImg/Wkxt.png);
+}
+.msgIconCqqk {
+    background-image: url(myImg/Cqqk.png);
+}
+.msgIconRcbx {
+    background-image: url(myImg/Rcbx.png);
+}
+.msgIconZxzy {
+    background-image: url(myImg/Zxzy.png);
+}
+.msgIconCjcx {
+    background-image: url(myImg/Cjcx.png);
+}
+.msgIcon82c9dd6d-35e5-408d-a7ae-9489c4b9a6e2 {
+    background-image: url(myImg/Cjcx.png);
+}
+.msgIcon4973bfe0-b514-4b77-b4ba-bc50f96e095e {
+    background-image: url(myImg/Zxzy.png);
+}
+.imageRadius {
+    -webkit-border-radius: 0.5em; 
+    border-radius: 0.5em;
+}
+.loading {
+    text-align:center;padding-top: 2em;
+}
+.NoNetworkColor {
+    background-color: #FEEDEE;
+}
+.diyLineHeight {
+    line-height: 2em;
+}
+.wordBreak{
+    white-space: pre-wrap;
+    word-break: break-all;
+}

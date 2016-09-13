@@ -1,0 +1,218 @@
+﻿<!DOCTYPE html>
+<html ng-app ng-controller="contactController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px" style="overflow-y:hidden">
+<head>
+    <title>联系人</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="css/ui-box.css">
+    <link rel="stylesheet" href="css/ui-base.css">
+    <link rel="stylesheet" href="css/ui-color.css">
+    <link rel="stylesheet" href="css/appcan.icon.css">
+    <link rel="stylesheet" href="css/appcan.control.css">
+    <link rel="stylesheet" href="MyContactContent/css/main.css">
+</head>
+<body class="um-vp bc-bg" ontouchstart>
+    <div id="loading" class="ub-f1">
+        <div class="loading">
+            <span class="fa fa-spinner fa-pulse"></span>&nbsp;正在加载中，请稍后...
+        </div>
+    </div>
+
+    <div id="show" style="display:none;">
+        <div class="bc-bg" id="NoData" ng-if="NoContact==1">
+            <div class="NoDataImg_box ">
+                <div class="NoDataImg_bg"></div>
+            </div>
+            <div class="NoData_box NoData_color " >
+                抱歉，暂时没有您要查看的数据！
+            </div>
+        </div>
+        <div id="ContactContent" ng-if="NoContact!=1">
+            <div id="divContent" class="c-wh">
+                <ul class="uinn-a7">
+                    <li class="ubb ub bc-border bc-text ub-ac lis" id="addContact">
+                        <div class="lis-icon-s ub-img" style="background-image: url(MyContactContent/css/myImg/v5.png)"></div>
+                        <div class="lv_title ub-f1 marg-l ub ub-ver ut-m line1">新的联系人</div>
+                        <div class="fa fa-angle-right ulev2 sc-text"></div>
+                    </li>
+                    <li class="ubb ub bc-border bc-text ub-ac lis groupContact" ng-repeat="group in Groups" id="group{{group.ID}}" ng-if="group.Type != 5">
+                        <div class="lis-icon-s ub-img groupIcon" style="background-image: url(MyContactContent/css/myImg/pt.png); " ng-if="group.Type==1"></div>
+                        <div class="lis-icon-s ub-img groupIcon" style="background-image: url(MyContactContent/css/myImg/avr.png); " ng-if="group.Type==2"></div>
+                        <div class="lis-icon-s ub-img groupIcon" style="background-image: url(MyContactContent/css/myImg/avk.png); " ng-if="group.Type==3"></div>
+                        <div class="lis-icon-s ub-img groupIcon" style="background-image: url('{{group.Icon}}');" ng-if="group.Type==4"></div>
+                        <div class="lv_title ub-f1 marg-l ub ub-ver ut-m line1 groupName">{{group.Name}}</div>
+                        <div class="fa fa-angle-right ulev2 sc-text"></div>
+                    </li>
+                </ul>
+                <div ng-repeat="letter in ContactCodes">
+                    <div id="{{letter}}" class="uinn3 sc-bg bc-text" ng-if="letter!=''&&letter!=null">{{letter}}</div>
+                    <ul class="uinn-a7">
+                        <li class="ubb ub bc-border bc-text ub-ac lis singleContact" ng-repeat="contact in Contacts" ng-if="contact.Code==letter&&contact.DName!=''&&contact.DName!=null " id="Contact{{contact.ID}}">
+                            <div class="lis-icon-s ub-img" style="background-image: url(MyContactContent/css/myImg/NoContactIcon.png)" ng-if="contact.Icon==null||contact.Icon==''"></div>
+                            <div class="lis-icon-s ub-img" style="background-image: url('{{contact.Icon}}')" ng-if="contact.Icon!=null&&contact.Icon!=''"></div>
+                            <div class="lv_title ub-f1 marg-l ub ub-ver ut-m line1 contactName">{{contact.DName}}</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="indexBar ub ub-ver">
+                <div>↑</div>
+                <div>#</div>
+                <div>A</div>
+                <div>B</div>
+                <div>C</div>
+                <div>D</div>
+                <div>E</div>
+                <div>F</div>
+                <div>G</div>
+                <div>H</div>
+                <div>I</div>
+                <div>J</div>
+                <div>K</div>
+                <div>L</div>
+                <div>M</div>
+                <div>N</div>
+                <div>O</div>
+                <div>P</div>
+                <div>Q</div>
+                <div>R</div>
+                <div>S</div>
+                <div>T</div>
+                <div>U</div>
+                <div>V</div>
+                <div>W</div>
+                <div>X</div>
+                <div>Y</div>
+                <div>Z</div>
+            </div>
+        </div>
+    </div>
+    <script src="js/appcan.js"></script>
+    <script src="js/appcan.control.js"></script>
+    <script src="js/appcan.listview.js"></script>
+    <script src="js/angular.min.js"></script>
+</body>
+<script>
+
+    $(function () {
+        $(".uinn-a7 li").on("click", function () {
+            $(this).addClass("sc-bg-active");
+            setTimeout("$('.uinn-a7 li').removeClass('sc-bg-active');", 300);
+        });
+
+        $(".indexBar div").on("touchstart", function () {
+            $(".indexBar").addClass("sc-bg-active");
+            var txt = $(this).html();
+            if (txt == "↑") location.href = "#addContact";
+            else location.href = "#" + txt;
+        });
+
+        $(".indexBar").on("touchmove", function () {
+            event.preventDefault();
+            var touch = event.touches[0];
+            var touchY = touch.pageY;
+            var childLen = $(".indexBar div").length;
+            var indexBarH = $(".indexBar").offset().height;
+            var txt;
+            var minY;
+            var maxY;
+
+            $(".indexBar div").each(function (i) {
+
+                minY = i * (indexBarH / childLen) + 1;
+                maxY = (i + 1) * (indexBarH / childLen);
+                if (touchY >= minY && touchY <= maxY) {
+                    txt = $(this).html();
+                    if (txt == "↑") location.href = "#addContact";
+                    else location.href = "#" + txt;
+
+                    return false;
+                }
+            });
+
+            // if (txt != undefined) {
+            // appcan.window.openToast(txt, 9000000);
+            // }
+        });
+        $(".indexBar").on("touchend", function () {
+            $('.indexBar').removeClass('sc-bg-active');
+            //appcan.window.closeToast();
+        });
+        $(".groupContact").on("click", function () {
+            var touchendName = $(this).find(".groupName").html();
+            var touchendID = $(this).attr("id");
+            appcan.locStorage.setVal("touchName", touchendName);
+            appcan.locStorage.setVal("touchID", touchendID);
+            appcan.window.open("groupContacts", "MyContact/GroupContacts.html", 2);
+        });
+        //获取点击联系人
+        $(".singleContact").on("click", function () {
+            var touchendName = $(this).find(".contactName").html();
+            var touchendID = $(this).attr("id");
+            var TouchendID = touchendID.substring(7, touchendID.length);
+            appcan.locStorage.setVal("contactName", touchendName);
+            appcan.locStorage.setVal("contactID", TouchendID);
+            appcan.window.open("SingleContact", "MyContact/SingleContact.html", 2)
+        });
+    })
+
+    appcan.ready(function () {
+        //appcan.initBounce();
+        //var plat = uexWidgetOne.getPlatform();
+        ////如果是iOS取消滚动条隐藏
+        //if (!plat) {
+        //    $("html").removeAttr("style");
+        //}
+        $("#show").show();
+        $("#loading").hide();
+        //index bar
+        var x = parseInt($('#divContent').offset().width); //480
+        var em = $('#divContent').css('font-size');//24px
+        var w = 1.5 * parseInt(em);//1.4 * 24
+        var h = appcan.getLocVal('uexIndexBar_h') + "px";//622
+
+        $(".indexBar").css({ position: "fixed", top: "0", left: (x - w) + "px", height: h, width: w + "px", "z-index": "99999" });
+        $(".indexBar").css("z-index","99999");
+        $(".indexBar div").addClass("ub-f1").css({ "text-align": "center" });
+
+    });//appcan.ready结束
+
+    //angularjs控制器
+    function contactController($scope) {      
+        $scope.ContactCodes = [];
+        var allContacts = [];
+        var contactGroups = appcan.locStorage.getVal("contactsData");
+        $scope.Groups = JSON.parse(contactGroups);
+        //alert(JSON.stringify(Groups));
+        //获取全部联系人
+        for (var m = 0; m < $scope.Groups.length; m++) {
+            if ($scope.Groups[m].Type == 5) {
+                allContacts = $scope.Groups[m].ContactLists;
+            }
+        }
+        if (allContacts == '' || allContacts == null) {
+            $scope.NoContact = 1;
+        }
+        //$scope.NoContact = 1;
+        appcan.locStorage.setVal("allContacts", allContacts);
+        $scope.Contacts = allContacts;
+        
+        //首字母去重
+        DistinctCode($scope.Contacts);
+        function DistinctCode(Contacts) {
+            for (var j = 0; j < Contacts.length; j++) {
+                var contact = Contacts[j].Code;
+                if ($scope.ContactCodes.indexOf(contact) < 0) {
+                    $scope.ContactCodes.push(contact);
+                }
+            }
+        }
+    };//控制器结束
+
+    $(function () {
+        $("ul li:last-child").css({ "border-bottom": "#FFFFFF" });
+    });
+
+</script>
+</html>

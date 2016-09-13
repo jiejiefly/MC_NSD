@@ -1,0 +1,47 @@
+    .divCld-date {
+        padding-left:4.25em;
+        padding-top:0.25em;
+        padding-bottom:0.25em;
+    }
+    .divLeft {
+        height:4em;
+        line-height:4em;
+        border-right:solid 0.125em gray;
+    }
+    .divLeft div {
+        float:right;
+        width:5em;
+        text-align:right;
+    }
+    .divLeft div span:first-child{
+        width:3.75em;
+        float:left;
+        overflow : hidden;
+        display:block;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        white-space: nowrap !important;      
+    }
+    .divLeft div span:last-child{
+        display:block;
+        display: -webkit-box;
+        margin-left:0em;
+        margin-right:-0.3325em;
+        font-size:2em;
+        color:gray;
+        float:right;
+    }
+    .divRight {
+        height:4em;
+        line-height:4em;
+        margin-left:1em;
+    }
+    .divRight div {
+            background-color:#BABABA;
+            padding-left:0.5em;
+            padding-right:0.5em;
+            height:2em;
+            line-height:2em;
+            margin-left:0.5em;
+    }

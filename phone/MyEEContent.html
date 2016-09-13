@@ -1,0 +1,148 @@
+﻿<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="css/ui-box.css">
+    <link rel="stylesheet" href="css/ui-base.css">
+    <link rel="stylesheet" href="css/ui-color.css">
+    <link rel="stylesheet" href="css/appcan.icon.css">
+    <link rel="stylesheet" href="css/appcan.control.css">
+    <link rel="stylesheet" href="MyEEContent/css/main.css">
+</head>
+<body class="um-vp bc-bg">
+    <div id="listview1" class="ubt ubb bc-border c-wh umar-at1"></div>
+    <div id="listview2" class="ubt ubb bc-border c-wh umar-at1 uinn-a7"></div>
+    <div id="listview3" class="ubt ubb bc-border c-wh umar-at1 uinn-a7"></div>
+    <script src="js/appcan.js"></script>
+    <script src="js/appcan.control.js"></script>
+    <script src="js/appcan.listview.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/Common.js"></script>
+</body>
+<script>
+    appcan.ready( function () {
+        var lv1 = appcan.listview( {
+            selector: "#listview1",
+            type: "thickLine",
+            hasIcon: true,
+            hasAngle: false,
+            hasSubTitle: false,
+            hasTouchEffect: false
+        } );
+        lv1.set( [{
+            icon: 'MyEEContent/css/myImg/myImg6.png',
+            title: '<div class="ub"><div class="umar-ar3" id="uId"></div></div>',
+            describe: '<span id="jxNum"></span>'
+        }] );
+
+        var userType;
+        function getData() {
+            var defer = $.Deferred();
+            var isSuccess = 0;
+            userType = appcan.getLocVal( "UserType" );
+            var Token = appcan.getLocVal( "Token" );
+            var apiConfig = JSON.parse( appcan.getLocVal( "ApiConfig" ) );
+            var Type = apiConfig.GetEEData.Type;
+            var Url = apiConfig.GetEEData.Url;
+            var parameters = { "token": Token };
+            var url = GetMappingUrl( Url, parameters );
+            $.ajax( {
+                url: url,
+                type: Type,
+                data: parameters,
+                dataType: "json",
+                success: function ( data ) {
+                    isSuccess = 1;
+                    appcan.locStorage.val( "EEData", data );
+                    defer.resolve( data );
+                },
+                complete: function () {
+                    if ( isSuccess == 0 ) {
+                        appcan.ready( function () {
+                            appcan.window.openToast( {
+                                msg: '加载最新数据失败',
+                                duration: '2000',
+                                position: '5',
+                                type: '0'
+                            } );
+                        } );
+                    }
+                }
+            } );
+            return defer.promise();
+        }
+
+        $.when( getData() ).done( function ( data ) {
+            var EEData = JSON.parse( appcan.locStorage.val( "EEData" ) );
+            var lv2 = appcan.listview( {
+                selector: "#listview2",
+                type: "thinLine",
+                hasIcon: false,
+                hasAngle: false,
+                hasSubTitle: false,
+                hasTouchEffect: false
+            } );
+            var arrItem = [];
+
+            //3种不同角色，显示的信息不一样。
+            if ( userType == "Teacher" ) {
+                arrItem.push( { title: '所教班级：' + EEData[0].ClassName }, { title: '职称：' + EEData[0].ZC }, { title: '所属部门：' + EEData[0].Department }, { title: '联系电话：' + EEData[0].Phone } );
+            }
+            else if ( userType == "Parents" ) {
+                arrItem.push( { title: '学生姓名：' + EEData[0].StudentName }, { title: '班级：' + EEData[0].ClassName }, { title: '联系电话：' + EEData[0].Phone }, { title: '电子邮箱：' + EEData[0].Email } );
+            }
+            else if ( userType == "Student" ) {
+                arrItem.push( { title: '班级：' + EEData[0].ClassName }, { title: '政治面貌：' + EEData[0].ZZMM }, { title: '入学日期：' + EEData[0].RXRQ }, { title: '电子邮箱：' + EEData[0].Email }, { title: '家长姓名：' + EEData[0].JZXM } );
+            }
+            lv2.set( arrItem );
+        } );
+
+        var lv3 = appcan.listview( {
+            selector: "#listview3",
+            type: "thinLine",
+            hasIcon: false,
+            hasAngle: false
+        } );
+        lv3.set( [{
+            title: '注销',
+        }] );
+        lv3.on( 'click', function ( ele, context, obj, subobj ) {
+            //appcan.device.getInfo( 13, function ( err, data, dataType, optId ) {
+                //var netStatus = JSON.parse( data );
+                //if ( netStatus.connectStatus == "-1" )//-1：网络不可用，0：WIFI 1：3G，2：2G
+                //{
+                //    //网络不可用
+                //    appcan.window.openToast( "网络不可用，请稍候重试！", 1000 );
+                //}
+               // else {
+                    appcan.window.confirm( {
+                        title: '提示',
+                        content: '是否继续注销',
+                        buttons: ['注销', '取消'],
+                        callback: function ( err, data, dataType, optId ) {
+                            if ( err ) return;
+                            if ( data == 0 ) {
+                                appcan.window.evaluateScript( {
+                                    name: "MainTab",
+                                    scriptContent: "ExitSys()"
+                                } );
+                            }
+                        }
+                    } );
+               // }
+            //} );
+        } );
+        var EE = JSON.parse( appcan.getLocVal( "UserInfo" ) );
+        $( function () {
+            $( '#uId' ).html( EE.DisplayName );
+            $( '#jxNum' ).html( EE.Account.Name );
+            if ( EE.PortraitUri != null ) {
+                $( "#listview1 .lis-icon" ).css( "background-image", "url(" + EE.PortraitUri + ")" );
+            }
+        } );
+    } );
+</script>
+</html>

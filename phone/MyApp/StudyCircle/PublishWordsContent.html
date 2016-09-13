@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html ng-app ng-controllor="PublishWordsControllor" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+    <head>
+        <title>学习圈发表文字浮动页面</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="../../css/fonts/font-awesome.min.css">
+        <link rel="stylesheet" href="../../css/ui-box.css">
+        <link rel="stylesheet" href="../../css/ui-base.css">
+        <link rel="stylesheet" href="../../css/ui-color.css">
+        <link rel="stylesheet" href="../../css/appcan.icon.css">
+        <link rel="stylesheet" href="../../css/appcan.control.css">
+    </head>
+    <body class="um-vp bc-bg" ontouchstart>
+        <div class="uinn">
+            <div class="uba bc-border uinput ub ub-f1">
+                <textarea placeholder="点击输入..." type="text" class="ub-f1"></textarea>
+            </div>
+        </div>
+    </body>
+    <script src="../../js/appcan.js"></script>
+    <script src="../../js/appcan.control.js"></script>
+    <script src="../../js/angular.min.js"></script>
+    <script src="../../js/Common.js"></script>
+    </body>
+    <script>
+        function PublishWordsControllor($scope){
+            PublishWords($scope);
+            appcan.ready(function() {
+            });
+        }
+        function PublishWords(){
+            var content = $("textarea").val().trim();
+            if( content == "" ){
+                appcan.window.openToast(" 请输入内容后重试！", 1000);
+            }else{
+                var UserInfo = JSON.parse(appcan.locStorage.val("UserInfo"));
+                var UserName = UserInfo.DisplayName;
+                var UserId = UserInfo.Id;
+                var token = appcan.locStorage.val("Token");
+                var Location = "";
+                //var url = appcan.locStorage.val("BaseUrl") + "/SEP.Circle/api/topic/add";
+                var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+                var url = apiConfig.PublishWords.Url;
+                var data = { "UserName": UserName, "UserID": UserId, "Location": Location, "PublishWordsContent": content, "accessToken": token };
+                url = GetMappingUrl(url, data);
+                var Type = apiConfig.PublishWords.Type;
+                var isSuccess = 0;
+                $.ajax({
+                    url: url,
+                    type: Type,
+                    data: data,
+                    dataType: "json",
+                    success: function (msg) {
+                        isSuccess = 1;
+                        appcan.window.openToast("发表成功！", 1000);
+                        appcan.window.evaluateScript({
+                            name:'StudyCircle',
+                            scriptContent:'ReFreshContent()'
+                        });
+                        setTimeout("appcan.window.evaluateScript({name:'PublishWords',scriptContent:'CloseWindow()'});", 1000)
+                    },
+                    complete: function (xhr, status) {
+                        if (isSuccess == 0) {
+                            appcan.window.confirm({
+                                title: '错误信息',
+                                content: '发送失败！',
+                                buttons: ['重试', '关闭'],
+                                callback: function (err, data, dataType, optId) {
+                                    if (err) {
+                                        return;
+                                    }
+                                    if (data == 0) {
+                                        PublishWords();
+                                    }
+                                    else if (data == 1) {
+                                        appcan.window.evaluateScript({
+                                            name:'PublishWords',
+                                            scriptContent:'CloseWindow()'
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });//ajax结束
+            }
+        }
+    </script>
+</html>

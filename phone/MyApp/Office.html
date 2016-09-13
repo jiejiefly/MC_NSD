@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+    <head>
+        <title>行政办公主窗口</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
+        <link rel="stylesheet" href="../css/ui-box.css">
+        <link rel="stylesheet" href="../css/ui-base.css">
+        <link rel="stylesheet" href="../css/ui-color.css">
+        <link rel="stylesheet" href="../css/appcan.icon.css">
+        <link rel="stylesheet" href="../css/appcan.control.css">
+        <link rel="stylesheet" href="OfficeContent/css/main.css">
+    </head>
+    <body class="um-vp " ontouchstart>
+        <div id="page_0" class="up ub ub-ver bc-bg" tabindex="0">
+            <!--header开始-->
+            <div id="header" class="uh bc-text-head ub bc-head">
+                <div class="nav-btn" id="nav-left">
+                   <div class="ub-img icon-close umw2 umh4"></div>
+                </div>
+                <h1 class="ut ub-f1 ulev-3 ut-s tx-c" tabindex="0">行政办公</h1>
+                <div class="nav-btn nav-bt" id="nav-right">
+                    <!--按钮开始-->
+                    
+                    <!--按钮结束-->
+                </div>
+            </div>
+            <div id="tabview" class="uf ulev-tab ub ubb bc-border c-wh">
+
+            </div>
+            <!--header结束--><!--content开始-->
+            <div id="content" class="ub-f1 tx-l">
+
+            </div>
+            <!--content结束-->
+        </div>
+        <script src="../js/appcan.js"></script>
+        <script src="../js/appcan.control.js"></script>
+        <script src="../js/appcan.tab.js"></script>
+    </body>
+    <script>
+        var tabview = appcan.tab({
+            selector : "#tabview",
+            hasIcon : false,
+            hasAnim : true,
+            hasLabel : true,
+            hasBadge : true,
+            data : [{
+                label : "我的申请",
+            }, {
+                label : "待审批",
+            }, {
+                label : "已审批",
+            }]
+        });
+        tabview.on("click",function(obj, index){
+            appcan.window.selectMultiPopover("content",index);
+        });
+        
+        appcan.ready(function() {
+            var top = $('#header').offset().height + $('#tabview').offset().height;
+            appcan.frame.open({
+                id : "content",
+                url : [{
+                    "inPageName": "OfficeApplyContent",
+                    "inUrl" : "OfficeApplyContent.html",
+                }, {
+                    "inPageName": "OfficeNoApproveContent",
+                    "inUrl" : "OfficeNoApproveContent.html",
+                }, {
+                    "inPageName": "OfficeApproveContent",
+                    "inUrl" : "OfficeApproveContent.html",
+                }],
+                top : top,
+                left : 0,
+                index : 0,
+                change:function(err,res){
+                    tabview.moveTo(res.multiPopSelectedIndex);
+                }
+            });
+            window.onorientationchange = window.onresize = function(){
+                appcan.frame.resize("content", 0, top);
+            }
+        });
+        
+        function Refresh(){
+            appcan.frame.closeMulti("content");
+            
+            var Index = appcan.locStorage.val("Type");
+            
+            var top = $('#header').offset().height + $('#tabview').offset().height;
+            appcan.frame.open({
+                id : "content",
+                url : [{
+                    "inPageName" : "OfficeApplyContent",
+                    "inUrl" : "OfficeApplyContent.html",
+                }, {
+                    "inPageName" : "OfficeNoApproveContent",
+                    "inUrl" : "OfficeNoApproveContent.html",
+                }, {
+                    "inPageName" : "OfficeApproveContent",
+                    "inUrl" : "OfficeApproveContent.html",
+                }],
+                top : top,
+                left : 0,
+                index : Index,
+                change:function(err,res){
+                    tabview.moveTo(res.multiPopSelectedIndex);
+                }
+            });
+            window.onorientationchange = window.onresize = function(){
+                appcan.frame.resize("content", 0, top);
+            }
+            
+            appcan.locStorage.remove("Type");
+            
+        }
+        
+        appcan.button("#nav-left", "btn-act", function() {
+            appcan.window.close(-1);
+        })
+
+    </script>
+</html>

@@ -1,0 +1,25 @@
+
+.first{
+    background-image:url('myImg/first.png');
+    background-size:80%;
+    background-repeat:no-repeat;
+}
+.second{
+    background-image:url('myImg/second.png');
+    background-size:80%;
+    background-repeat:no-repeat;
+}
+.third{
+    background-image:url('myImg/third.png');
+    background-size:80%;
+    background-repeat:no-repeat;
+}
+.circle-pic{
+    width:5em;
+    height:5em;
+    border-radius:8em; 
+}
+.pding{
+    padding:1em 0em 0em 0.625em;
+}
+.loading{text-align:center;padding-top: 4.75em;}

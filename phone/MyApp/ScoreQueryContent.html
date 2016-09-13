@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html ng-app ng-controller="MyScoreListController" class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <title>成绩查询浮动窗口</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/ui-box.css">
+    <link rel="stylesheet" href="../css/ui-base.css">
+    <link rel="stylesheet" href="../css/ui-color.css">
+    <link rel="stylesheet" href="../css/appcan.icon.css">
+    <link rel="stylesheet" href="../css/appcan.control.css">
+    <link rel="stylesheet" href="ScoreQueryContent/css/main.css">
+</head>
+<body class="um-vp bc-bg">
+    <div id="divLoading" class="ub-f1">
+        <div class="loading">
+            <span class="fa fa-spinner fa-pulse"></span>&nbsp;正在加载中，请稍后...
+        </div>
+    </div>
+
+    <div id="divContent" style="display:none; padding:0.625em 0;">
+        <div class="bc-bg" ng-if="NoData==1">
+            <div class="NoDataImg_box ">
+                <div class="NoDataImg_bg"></div>
+            </div>
+            <div class="NoData_box NoData_color">抱歉，暂时没有您要查看的数据！</div>
+        </div>
+        <div class="umar-b" ng-repeat="scoreList in MyScoreDetails" ng-if="NoData!=1">
+            <div class="uba bc-border c-wh umar-v uc-a1  test">
+                <div class="ub ub-pj examid uinn7" examid="{{scoreList.ExamID}}" subject="{{scoreList.Subject}}">
+                    <div class="umh4 umw3 uinn umw-t">
+                        <li class="umar-b">
+                            <div class="ulev0 txt-v ">{{scoreList.Title}}</div>
+                        </li>
+                        <li class="sc-text ulev-1 umar-b umar-t">
+                            {{scoreList.Type}}
+                        </li>
+                    </div>
+                    <div class="umh4 umw3 txt-v uinn score">
+                        {{scoreList.Score}}分
+                    </div>
+                </div>
+
+                <div class="ubt bc-border"></div>
+
+                <div class="ub-pj ub rank uinn7" examid="{{scoreList.ExamID}}">
+                    <div class="ub ub-f1">
+                        <div class="umh2 umw2 ub-pj ub umar-l">
+                            <div class="umw2 book-pic"></div>
+                            <div class="ulev-1 umar-t sc-text">{{scoreList.Subject}}</div>
+                        </div>
+                        <div class="umh2 umw2 ub-pj ub l-margin">
+                            <div class="umw2 clock-pic"></div>
+                            <div class="ulev-1 umar-t sc-text">{{scoreList.ScoreDate}}</div>
+                        </div>
+                    </div>
+                    <div class="umh2 umw2 ub-pj ub">
+                        <div class="umw2 cup-pic"></div>
+                        <div class="ulev-1 umar-t sc-text">班级排名：{{scoreList.Rank}}</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="../js/appcan.js"></script>
+    <script src="../js/appcan.control.js"></script>
+    <script src="../js/angular.min.js"></script>
+    <script src="../js/appcan.tab.js"></script>
+    <script src="../js/Common.js"></script>
+</body>
+<script>
+    appcan.ready(function () {
+
+        $(".examid").on("touchstart", function () {
+            var subject = $(this).attr("Subject");
+            if (subject == "多科"){
+                $(this).addClass("sc-bg-active");
+            }
+        }).on("touchend", function () {
+            $(this).removeClass('sc-bg-active');
+        }).on("touchmove", function () {
+            $(this).removeClass('sc-bg-active');
+        }).on("click", function () {
+            var subject = $(this).attr("Subject");
+            if (subject == "多科"){
+                var examID = $(this).attr("examid");
+                appcan.locStorage.setVal("ExamID", examID);
+                appcan.window.open({
+                    name: 'SubjectDetails',
+                    data: 'ScoreQuery/SubjectDetails.html',
+                    aniId: 2
+                });
+            }
+        });
+
+        $(".rank").on("touchstart", function () {
+            $(this).addClass("sc-bg-active");
+        }).on("touchend", function () {
+            $(this).removeClass('sc-bg-active');
+        }).on("touchmove", function () {
+            $(this).removeClass('sc-bg-active');
+        }).on("click", function () {
+            var examID = $(this).attr("examid");
+            appcan.locStorage.setVal("ExamID", examID);
+            appcan.window.open({
+                name: 'RankMainFrame',
+                data: 'ScoreQuery/RankMainFrame.html',
+                aniId: 2
+            });
+        });
+   
+        $("#divLoading").hide();
+        $("#divContent").show();
+    })
+
+    //通过ajax向服务器请求数据
+    function MyScoreListController($scope, $http) {
+        var token = appcan.locStorage.val("Token");
+        var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+        var Url = apiConfig.GetExamInfo.Url;
+        var Type = apiConfig.Notice.Type;
+        var parameters = { 'token': token };
+        var url = GetMappingUrl(Url, parameters);
+        var isSuccess = 0;
+
+        $.ajax({
+            url: url,
+            type: Type,
+            async: false,
+            data: parameters,
+            dataType: "json",
+            success: function (data) {
+                isSuccess = 1;
+                var Data = data;
+                if(Data.res_code == undefined){
+                    if(data == ""){
+                        $scope.NoData = 1;
+                    }else{
+                        $scope.MyScoreDetails = Data;
+                        appcan.locStorage.setVal("ScoreData", data);
+                    }
+                }
+                else if (Data.res_code == "0") { }
+                else if (Data.res_code == "-1") {
+                    //-1表示Token无效
+                    alert("请重新登录！");
+                    appcan.window.evaluateScript({
+                        name: "MainTab",
+                        scriptContent: "ExitSys()"
+                    });
+                }
+                else {
+                    alert(res_message);
+                }
+            },
+            
+            complete: function (xhr, type, error){ 
+                if(isSuccess == 0){
+                   appcan.ready(function() {
+                        appcan.window.openToast({
+                            msg:'加载最新数据失败',
+                            duration:2000,
+                            position:5,
+                            type:0
+                        });
+                   }); 
+                   var ScoreData = appcan.locStorage.val("ScoreData");
+                   if(ScoreData == undefined || ScoreData == null){
+                       $scope.NoData = 1;
+                   }else{
+                       $scope.MyScoreDetails = JSON.parse(ScoreData);
+                   }
+                }
+            }
+        });
+    }
+</script>
+</html>

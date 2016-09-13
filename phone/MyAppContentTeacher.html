@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+    <head>
+        <title></title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="css/fonts/font-awesome.min.css">
+        <link rel="stylesheet" href="css/ui-box.css">
+        <link rel="stylesheet" href="css/ui-base.css">
+        <link rel="stylesheet" href="css/ui-color.css">
+        <link rel="stylesheet" href="css/appcan.icon.css">
+        <link rel="stylesheet" href="css/appcan.control.css">
+        <link rel="stylesheet" href="MyAppContent/css/main.css">
+    </head>
+    <body class="um-vp bc-bg">
+        <div class="ub ub-ver c-wh h100">
+            <div class="ub-f1 ub ub-ver">
+                <div class="ub bc-text">
+                    <div class="ub-f1 ub ub-ver ub-ac ub-pc umar-b">
+                        <div id="divXXQ" class="ub-img uwh-acc2 accIcon1 umar-at1"></div>
+                        <div class="ulev-1 umar-t-acc1">学习圈</div>
+                    </div>
+                    <div class="ub-f1 ub ub-ver ub-ac ub-pc umar-b">
+                        <div id="divKCB" class="ub-img uwh-acc2 accIcon3 umar-at1"></div>
+                        <div class="ulev-1 umar-t-acc1">课程表</div>
+                    </div>
+                     <div class="ub-f1 ub ub-ver ub-ac ub-pc umar-b">
+                        <div id="divCQQK" class="ub-img uwh-acc2 accIcon9 umar-at1"></div>
+                        <div class="ulev-1 umar-t-acc1">出勤情况</div>
+                    </div>
+                    <div class="ub-f1 ub ub-ver ub-ac ub-pc umar-b">
+                        <div id="divRCBX" class="ub-img uwh-acc2 accIcon10 umar-at1"></div>
+                        <div class="ulev-1 umar-t-acc1">日常表现</div>
+                    </div>
+                </div>
+                <div class="ub bc-text">
+                    <div class="ub-f1 ub ub-ver ub-ac ub-pc umar-b">
+                        <div id="divTZGG" class="ub-img uwh-acc2 accIcon8 umar-at1"></div>
+                        <div class="ulev-1 umar-t-acc1">通知公告</div>
+                    </div>
+                    <div class="ub-f1 ub ub-ver ub-ac ub-pc umar-b">
+                        <div id="divJRZY" class="ub-img uwh-acc2 accIcon11 umar-at1"></div>
+                        <div class="ulev-1 umar-t-acc1">今日作业</div>
+                    </div>
+                    <div class="ub-f1 ub ub-ver ub-ac ub-pc umar-b">
+                        <div id="divXZBG" class="ub-img uwh-acc2 accIcon7 umar-at1"></div>
+                        <div class="ulev-1 umar-t-acc1">行政办公</div>
+                    </div>
+                    <div class="ub-f1 ub ub-ver ub-ac ub-pc umar-b">
+                        <div id="divXSQJ" class="ub-img uwh-acc2 accIcon14 umar-at1"></div>
+                        <div class="ulev-1 umar-t-acc1">学生请假</div>
+                    </div>
+                </div>
+                <div class="ub bc-text">
+                    <div class="ub-f1 ub ub-ver ub-ac ub-pc umar-b">
+                        <div id="divMZCP" class="ub-img uwh-acc2 accIcon15 umar-at1"></div>
+                        <div class="ulev-1 umar-t-acc1">每周菜谱</div>
+                    </div>
+                     <div class="ub-f1 ub ub-ver ub-ac ub-pc umar-b">
+                        <div id="divMZRC" class="ub-img uwh-acc2 accIcon16 umar-at1"></div>
+                        <div class="ulev-1 umar-t-acc1">每周日程</div>
+                    </div>
+                    <div class="ub-f1 ub ub-ver ub-ac ub-pc umar-b">
+                        <div id="" class="ub-img uwh-acc2 umar-at1"></div>
+                        <div class="ulev-1 umar-t-acc1"></div>
+                    </div>
+                    <div class="ub-f1 ub ub-ver ub-ac ub-pc umar-b">
+                        <div id="" class="ub-img uwh-acc2 umar-at1"></div>
+                        <div class="ulev-1 umar-t-acc1"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="js/appcan.js"></script>
+        <script src="js/appcan.control.js"></script>
+    </body>
+    <script>
+
+        appcan.ready(function() { });
+
+        appcan.button(".ub-img", "btn-act", function (a, b) {
+
+            var apiConfig = JSON.parse(appcan.getLocVal("ApiConfig"));
+            var WKUrl = apiConfig.WKUrl.Url;
+            
+            switch (this.id) {
+                case 'divKCB':
+                    appcan.window.open("LessonSchedule", "MyApp/LessonSchedule.html", 5);//课程表
+                    break;
+                case 'divXXQ':
+                    appcan.window.open("StudyCircle", "MyApp/StudyCircle.html", 5);//学习圈
+                    break;
+                case 'divTZGG':
+                    appcan.window.open("Notice", "MyApp/Notice.html", 5);//通知公告
+                    break;
+                case 'divCQQK':
+                    appcan.window.open("Attendance", "MyApp/Attendance.html", 5);//出勤情况
+                    break;
+                case 'divRCBX':
+                    appcan.window.open("DailyPer", "MyApp/DailyPer.html", 5);//日常表现
+                    break;
+                case 'divJRZY':
+                    appcan.window.open("Homework", "MyApp/Homework.html", 5);//今日作业
+                    break;
+                case 'divXZBG':
+                    appcan.window.open("Office", "MyApp/Office.html", 5);//行政办公
+                    break;
+                case 'divXSQJ':
+                    appcan.window.open("StudentsLeave", "MyApp/StudentsLeave.html", 5); //学生请假
+                    break;
+                case 'divMZCP':
+                    appcan.window.open("WeeklyRecipes","MyApp/WeeklyRecipes.html", 5); //每周菜谱
+                    break;
+                case 'divMZRC':
+                    appcan.window.open("SchedulingProgram","MyApp/SchedulingProgram.html", 5);  //每周日程
+                    break;
+            }
+        });
+    </script>
+</html>
